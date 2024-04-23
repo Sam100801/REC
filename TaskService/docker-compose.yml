@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+
+  my-sba-task:
+    image: bellsoft/liberica-openjdk-alpine:17
+    container_name: mysbaimage-task
+    ports:
+      - 8081:8080
+      - 8001:8000
+    expose:
+      - "8001"
+    depends_on:
+      - my-db-task
+    networks:
+      - my-net
+    volumes:
+      - ./build/libs/TaskService-0.0.1-SNAPSHOT.jar:/app/app.jar
+    working_dir: /app
+    entrypoint: java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000 -jar /app/app.jar
+
+
+  my-db-task:
+    image: mongo:5.0
+    container_name: mongodbimage-task
+    ports:
+      - 27018:27018
+    command: ["mongod", "--port", "27018"]
+    networks:
+      - my-net
+
+networks:
+  my-net:
+    driver: "bridge"
+
