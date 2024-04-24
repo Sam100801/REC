@@ -56,7 +56,7 @@ public class LoginController {
 
             }
 
-            String role = (user != null) ? "USER" : (amministratore != null) ? "ADMIN" : "PRODUTTORE";
+            String role = user != null ? "USER" : amministratore != null ? "ADMIN" : "PRODUTTORE";
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 

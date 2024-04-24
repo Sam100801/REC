@@ -6,12 +6,13 @@ import java.time.LocalDateTime;
 
 public class TaskDTO {
     private String id;
+    private String creatoDa;
 
     private String titolo;
 
     private String descrizione;
 
-    private String assignedUserId;
+    private String assignedUserEmail;
 
     private String linkGitHub;
 
@@ -28,6 +29,14 @@ public class TaskDTO {
 
     public void setDataCreazione(LocalDateTime dataCreazione) {
         this.dataCreazione = dataCreazione;
+    }
+
+    public String getCreatoDa() {
+        return creatoDa;
+    }
+
+    public void setCreatoDa(String creatoDa) {
+        this.creatoDa = creatoDa;
     }
 
     public TaskStatus getStatus() {
@@ -62,12 +71,12 @@ public class TaskDTO {
         this.descrizione = descrizione;
     }
 
-    public String getAssignedUserId() {
-        return assignedUserId;
+    public String getAssignedUserEmail() {
+        return assignedUserEmail;
     }
 
-    public void setAssignedUserId(String assignedUserId) {
-        this.assignedUserId = assignedUserId;
+    public void setAssignedUserEmail(String assignedUserEmail) {
+        this.assignedUserEmail = assignedUserEmail;
     }
 
     public String getLinkGitHub() {

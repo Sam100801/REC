@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,10 +33,12 @@ public class TaskRestController {
 
         AuthorizationAPI authorizationAPI = new AuthorizationAPI();
         authorizationAPI.checkAuthorizationRole(request, jwtUtilities);
+        String username = jwtUtilities.extractUsername(request.getHeader("Authorization").substring(7));
 
         Task task = new Task();
+        task.setCreatoDa(username);
         task.setDescrizione(taskDTO.getDescrizione());
-        task.setAssignedUserId(taskDTO.getAssignedUserId());
+        task.setAssignedUserEmail(taskDTO.getAssignedUserEmail());
         task.setLinkGitHub(taskDTO.getLinkGitHub());
         task.setDataCreazione(LocalDateTime.now());
         task.setStatus(TaskStatus.DAFARE);
@@ -62,7 +63,8 @@ public class TaskRestController {
 
         taskDTO.setId(task.get().getId());
         taskDTO.setDescrizione(task.get().getDescrizione());
-        taskDTO.setAssignedUserId(task.get().getAssignedUserId());
+        taskDTO.setCreatoDa(task.get().getCreatoDa());
+        taskDTO.setAssignedUserEmail(task.get().getAssignedUserEmail());
         taskDTO.setLinkGitHub(task.get().getLinkGitHub());
         taskDTO.setDataCreazione(task.get().getDataCreazione());
         taskDTO.setStatus(task.get().getStatus());
@@ -86,8 +88,9 @@ public class TaskRestController {
         for (Task task : filteredTasks) {
             TaskDTO taskDTO = new TaskDTO();
             taskDTO.setId(task.getId());
+            taskDTO.setCreatoDa(task.getCreatoDa());
             taskDTO.setDescrizione(task.getDescrizione());
-            taskDTO.setAssignedUserId(task.getAssignedUserId());
+            taskDTO.setAssignedUserEmail(task.getAssignedUserEmail());
             taskDTO.setLinkGitHub(task.getLinkGitHub());
             taskDTO.setDataCreazione(task.getDataCreazione());
             taskDTO.setStatus(task.getStatus());
@@ -110,8 +113,8 @@ public class TaskRestController {
         if (task.getDescrizione() != null) {
             task.setDescrizione(taskDTO.getDescrizione());
         }
-        if (task.getAssignedUserId() != null) {
-            task.setAssignedUserId(taskDTO.getAssignedUserId());
+        if (task.getAssignedUserEmail() != null) {
+            task.setAssignedUserEmail(taskDTO.getAssignedUserEmail());
         }
         if (task.getLinkGitHub() != null) {
             task.setLinkGitHub(taskDTO.getLinkGitHub());
@@ -135,19 +138,6 @@ public class TaskRestController {
         return "Task deleted successfully";
     }
 
-    @RequestMapping(value = "assign/{id}", method = RequestMethod.PUT)
-    public String assignTask(@PathVariable String id, String userId) throws TaskNotFoundException {
-
-        Task task = taskRepository.findById(id).orElseThrow(TaskNotFoundException::new);
-
-        task.setAssignedUserId(userId);
-        task.setStatus(TaskStatus.COMPLETATO);
-
-        task = taskRepository.save(task);
-
-        return "Task assigned successfully";
-    }
-
     @RequestMapping(value = "complete/{id}", method = RequestMethod.PUT)
     public String completeTask(@PathVariable String id) throws TaskNotFoundException {
 
@@ -160,13 +150,13 @@ public class TaskRestController {
         return "Task completed successfully";
     }
 
-    @RequestMapping(value = "assignedTasks/{userId}", method = RequestMethod.GET)
-    public ListTaskDTO getAssignedTasks(@PathVariable String userId) {
+    @RequestMapping(value = "assignedTasks/{email}", method = RequestMethod.GET)
+    public ListTaskDTO getAssignedTasks(@PathVariable String email) {
 
         ArrayList<TaskDTO> list = new ArrayList<>();
         ListTaskDTO taskList = new ListTaskDTO();
 
-        List<Task> tasks = taskRepository.findByAssignedUserId(userId);
+        List<Task> tasks = taskRepository.findByAssignedUserEmail(email);
 
         List<Task> filteredTasks = tasks.stream().filter
                 (task -> task.getStatus().equals
@@ -176,7 +166,8 @@ public class TaskRestController {
             TaskDTO taskDTO = new TaskDTO();
             taskDTO.setId(task.getId());
             taskDTO.setDescrizione(task.getDescrizione());
-            taskDTO.setAssignedUserId(task.getAssignedUserId());
+            taskDTO.setCreatoDa(task.getCreatoDa());
+            taskDTO.setAssignedUserEmail(task.getAssignedUserEmail());
             taskDTO.setLinkGitHub(task.getLinkGitHub());
             taskDTO.setDataCreazione(task.getDataCreazione());
             taskDTO.setStatus(task.getStatus());
