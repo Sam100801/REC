@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+
+  my-sba-payment:
+    image: bellsoft/liberica-openjdk-alpine:17
+    container_name: mysbaimage-payment
+    ports:
+      - 8082:8080
+      - 8002:8000
+    expose:
+      - "8002"
+    depends_on:
+      - my-db-task
+    networks:
+      - my-net
+    volumes:
+      - ./build/libs/PaymentService-0.0.1-SNAPSHOT.jar:/app/app.jar
+    working_dir: /app
+    entrypoint: java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000 -jar /app/app.jar
+
+
+  my-db-payment:
+    image: mongo:5.0
+    container_name: mongodbimage-payment
+    ports:
+      - 27019:27019
+    command: ["mongod", "--port", "27019"]
+    networks:
+      - my-net
+
+networks:
+  my-net:
+    driver: "bridge"
+
