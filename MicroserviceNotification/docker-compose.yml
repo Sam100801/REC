@@ -2,14 +2,14 @@ version: "3.8"
 
 services:
 
-  my-sba:
+  my-sba-notification:
     image: bellsoft/liberica-openjdk-alpine:17
     container_name: notificationimage
     ports:
-      - 8081:8080
-      - 8001:8000
+      - 8084:8080
+      - 8004:8000
     expose:
-      - "8000"
+      - "8004"
     networks:
       - my-net
     volumes:
