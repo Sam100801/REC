@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+
+  my-sba-reward:
+    image: bellsoft/liberica-openjdk-alpine:17
+    container_name: mysbaimage-reward
+    ports:
+      - 8083:8080
+      - 8003:8000
+    expose:
+      - "8003"
+    depends_on:
+      - my-db-reward
+    networks:
+      - my-net
+    volumes:
+      - ./build/libs/RewardService-0.0.1-SNAPSHOT.jar:/app/app.jar
+    working_dir: /app
+    entrypoint: java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000 -jar /app/app.jar
+
+
+  my-db-reward:
+    image: mongo:5.0
+    container_name: mongodbimage-reward
+    ports:
+      - 27020:27020
+    command: ["mongod", "--port", "27020"]
+    networks:
+      - my-net
+
+networks:
+  my-net:
+    driver: "bridge"
+

@@ -1,16 +1,13 @@
 package it.unisalento.recproject.recproject.RestControllers;
 
 import it.unisalento.recproject.recproject.domain.Amministratore;
-import it.unisalento.recproject.recproject.domain.Reward;
-import it.unisalento.recproject.recproject.domain.User;
 import it.unisalento.recproject.recproject.dto.*;
 import it.unisalento.recproject.recproject.exceptions.AmministratoreNotFoundException;
 import it.unisalento.recproject.recproject.repositories.AmministratoreRepository;
-import it.unisalento.recproject.recproject.repositories.RewardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import static it.unisalento.recproject.recproject.configuration.SecurityConfig.passwordEncoder;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -21,8 +18,6 @@ public class AmministratoreRestController {
 
     @Autowired
     AmministratoreRepository amministratoreRepository;
-    @Autowired
-    RewardRepository rewardRepository;
 
     @RequestMapping(value = "/incasso/{id}", method = RequestMethod.GET)
     public float getIncasso(@PathVariable String id) throws AmministratoreNotFoundException {
@@ -34,28 +29,6 @@ public class AmministratoreRestController {
         }
 
         return amministratore.get().getIncasso();
-    }
-
-    @RequestMapping(value = "/reward", method = RequestMethod.GET)
-    public RewardListDTO getAll(){
-        ArrayList<RewardDTO> list = new ArrayList<>();
-        RewardListDTO rewardList = new RewardListDTO();
-        rewardList.setRewards(list);
-
-        List<Reward> rewards = rewardRepository.findAll();
-
-        for (Reward reward : rewards){
-            // Se isAssigned == True allora sono i prodotti per l'amministratore altrimenti sono per l'utente
-            if (reward.isAssigned() == true){
-                RewardDTO rewardDTO = new RewardDTO();
-                rewardDTO.setId(reward.getId());
-                rewardDTO.setNome(reward.getNome());
-                rewardDTO.setDescrizione(reward.getDescrizione());
-                list.add(rewardDTO);
-            }
-        }
-
-        return rewardList;
     }
 
     @RequestMapping(value = "/saldo/{id}", method = RequestMethod.GET)

@@ -1,4 +1,4 @@
-package it.unisalento.recproject.recproject.dto;
+package it.unisalento.recproject.rewardservice.dto;
 
 public class RewardDTO {
     private String id;
@@ -15,6 +15,13 @@ public class RewardDTO {
         this.descrizione = descrizione;
     }
 
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 
     public String getId() {
         return id;

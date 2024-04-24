@@ -2,17 +2,13 @@ package it.unisalento.recproject.recproject.RestControllers;
 
 import it.unisalento.recproject.recproject.di.IRenewableSource;
 import it.unisalento.recproject.recproject.domain.Abitazione;
-import it.unisalento.recproject.recproject.domain.Reward;
 import it.unisalento.recproject.recproject.domain.User;
 import it.unisalento.recproject.recproject.dto.*;
 import it.unisalento.recproject.recproject.exceptions.UserNotFoundException;
 import it.unisalento.recproject.recproject.repositories.AbitazioneRepository;
-import it.unisalento.recproject.recproject.repositories.RewardRepository;
 import it.unisalento.recproject.recproject.repositories.UserRepository;
-import it.unisalento.recproject.recproject.security.JwtUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,8 +25,6 @@ public class UsersRestController { //gestisce le richieste REST relative agli ut
     IRenewableSource windTurbine;
     @Autowired
     UserRepository userRepository;
-    @Autowired
-    RewardRepository rewardRepository;
     @Autowired
     AbitazioneRepository abitazioneRepository;
 
@@ -111,29 +105,6 @@ public class UsersRestController { //gestisce le richieste REST relative agli ut
 
         return "L'utente con id " + id + " è stato eliminato";
     }
-
-    @RequestMapping(value = "/lista_rewards", method = RequestMethod.GET)
-    public RewardListDTO listaRewardUtenti(){
-
-        ArrayList<RewardDTO> list = new ArrayList<>();
-        RewardListDTO rewardList = new RewardListDTO();
-        rewardList.setRewards(list);
-
-        List<Reward> rewards = rewardRepository.findAll();
-
-        for (Reward reward : rewards){
-            if (!reward.isAssigned()){
-                RewardDTO rewardDTO = new RewardDTO();
-                rewardDTO.setId(reward.getId());
-                rewardDTO.setNome(reward.getNome());
-                rewardDTO.setDescrizione(reward.getDescrizione());
-                list.add(rewardDTO);
-            }
-        }
-
-        return rewardList;
-    }
-
 
     //restituisce i crediti di un utente
     @RequestMapping(value = "/crediti/{id}", method = RequestMethod.GET)

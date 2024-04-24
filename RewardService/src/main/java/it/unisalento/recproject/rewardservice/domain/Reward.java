@@ -1,9 +1,7 @@
-package it.unisalento.recproject.recproject.domain;
+package it.unisalento.recproject.rewardservice.domain;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import javax.swing.*;
 
 @Document("reward")
 public class Reward {
@@ -23,6 +21,14 @@ public class Reward {
         this.id = id;
         this.nome = nome;
         this.descrizione = descrizione;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public boolean isAssigned() {
@@ -57,3 +63,4 @@ public class Reward {
         this.descrizione = descrizione;
     }
 }
+

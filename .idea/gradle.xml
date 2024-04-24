@@ -4,6 +4,14 @@
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/MicroserviceNotification" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/MicroserviceNotification" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/PaymentService" />
         <option name="modules">
           <set>
@@ -17,6 +25,14 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/RecProject" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/RewardService" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/RewardService" />
           </set>
         </option>
       </GradleProjectSettings>

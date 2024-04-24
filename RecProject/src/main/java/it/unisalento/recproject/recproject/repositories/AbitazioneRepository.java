@@ -1,7 +1,6 @@
 package it.unisalento.recproject.recproject.repositories;
 
 import it.unisalento.recproject.recproject.domain.Abitazione;
-import it.unisalento.recproject.recproject.domain.Reward;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 

@@ -1,14 +1,9 @@
 package it.unisalento.recproject.recproject.RestControllers;
 
-import it.unisalento.recproject.recproject.domain.Amministratore;
 import it.unisalento.recproject.recproject.domain.Produttore;
-import it.unisalento.recproject.recproject.domain.Reward;
-import it.unisalento.recproject.recproject.domain.User;
 import it.unisalento.recproject.recproject.dto.*;
 import it.unisalento.recproject.recproject.exceptions.ProduttoreNotFoundException;
-import it.unisalento.recproject.recproject.exceptions.UserNotFoundException;
 import it.unisalento.recproject.recproject.repositories.ProduttoreRepository;
-import it.unisalento.recproject.recproject.repositories.RewardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -17,32 +12,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static it.unisalento.recproject.recproject.configuration.SecurityConfig.passwordEncoder;
-
 @RestController
 @RequestMapping("/api/produttore")
 public class ProduttoreRestController {
 
     @Autowired
-    RewardRepository rewardRepository;
-    @Autowired
     ProduttoreRepository produttoreRepository;
-
-    @RequestMapping(value = "/crea_reward", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public RewardDTO creaReward(@RequestBody RewardDTO rewardDTO){
-
-        Reward reward = new Reward();
-
-        reward.setNome(rewardDTO.getNome());
-        reward.setDescrizione(rewardDTO.getDescrizione());
-        reward.setAssigned(true);
-
-        reward = rewardRepository.save(reward);
-
-        rewardDTO.setId(reward.getId());
-
-        return rewardDTO;
-    }
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public ProduttoreListDTO getAll(){
