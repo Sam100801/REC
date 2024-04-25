@@ -1,4 +1,4 @@
-package it.unisalento.recproject.taskservice.Service;
+package it.unisalento.recproject.taskservice.RestController;
 
 import it.unisalento.recproject.taskservice.domain.Task;
 import it.unisalento.recproject.taskservice.domain.TaskStatus;
@@ -51,7 +51,9 @@ public class TaskRestController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public TaskDTO getById(@PathVariable String id) throws TaskNotFoundException {
+    public TaskDTO getById(@PathVariable String id, HttpServletRequest request) throws TaskNotFoundException {
+        AuthorizationAPI authorizationAPI = new AuthorizationAPI();
+        authorizationAPI.checkAuthorizationRole(request, jwtUtilities);
 
         Optional<Task> task = taskRepository.findById(id);
 
@@ -74,7 +76,10 @@ public class TaskRestController {
     }
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    public ListTaskDTO getAll() {
+    public ListTaskDTO getAll(HttpServletRequest request) {
+
+        AuthorizationAPI authorizationAPI = new AuthorizationAPI();
+        authorizationAPI.checkAuthorizationRole(request, jwtUtilities);
 
         ArrayList<TaskDTO> list = new ArrayList<>();
         ListTaskDTO taskList = new ListTaskDTO();
@@ -105,7 +110,10 @@ public class TaskRestController {
     @RequestMapping(value = "update/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> updateTask(@RequestBody TaskDTO taskDTO, @PathVariable String id, HttpServletRequest request) throws TaskNotFoundException {
 
-        TaskDTO task = getById(id);
+        AuthorizationAPI authorizationAPI = new AuthorizationAPI();
+        authorizationAPI.checkAuthorizationRole(request, jwtUtilities);
+
+        TaskDTO task = getById(id, request);
 
         if (task.getTitolo() != null) {
             task.setTitolo(taskDTO.getTitolo());
@@ -127,9 +135,12 @@ public class TaskRestController {
     }
 
     @RequestMapping(value = "delete/{id}", method = RequestMethod.DELETE)
-    public String deleteTask(@PathVariable String id) throws TaskNotFoundException {
+    public String deleteTask(@PathVariable String id, HttpServletRequest request) throws TaskNotFoundException {
 
-        if (getById(id) == null) {
+        AuthorizationAPI authorizationAPI = new AuthorizationAPI();
+        authorizationAPI.checkAuthorizationRole(request, jwtUtilities);
+
+        if (getById(id,request) == null) {
             throw new TaskNotFoundException();
         }
         else
@@ -138,20 +149,26 @@ public class TaskRestController {
         return "Task deleted successfully";
     }
 
-    @RequestMapping(value = "complete/{id}", method = RequestMethod.PUT)
-    public String completeTask(@PathVariable String id) throws TaskNotFoundException {
+    @RequestMapping(value = "complete/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public String completeTask(@PathVariable String id, HttpServletRequest request) throws TaskNotFoundException {
+
+        AuthorizationAPI authorizationAPI = new AuthorizationAPI();
+        authorizationAPI.checkAuthorizationRole(request, jwtUtilities);
 
         Task task = taskRepository.findById(id).orElseThrow(TaskNotFoundException::new);
 
         task.setStatus(TaskStatus.COMPLETATO);
 
-        task = taskRepository.save(task);
+        taskRepository.save(task);
 
         return "Task completed successfully";
     }
 
     @RequestMapping(value = "assignedTasks/{email}", method = RequestMethod.GET)
-    public ListTaskDTO getAssignedTasks(@PathVariable String email) {
+    public ListTaskDTO getAssignedTasks(@PathVariable String email, HttpServletRequest request) {
+
+        AuthorizationAPI authorizationAPI = new AuthorizationAPI();
+        authorizationAPI.checkAuthorizationRole(request, jwtUtilities);
 
         ArrayList<TaskDTO> list = new ArrayList<>();
         ListTaskDTO taskList = new ListTaskDTO();
@@ -178,5 +195,41 @@ public class TaskRestController {
 
         return taskList;
     }
+
+    //Ritorna tutti i task che ha assegnato l'utente che fa questa chiamata API
+    @RequestMapping(value = "assignedByMe", method = RequestMethod.GET)
+    public ListTaskDTO getTaskCreateBy(HttpServletRequest request) {
+
+        AuthorizationAPI authorizationAPI = new AuthorizationAPI();
+        authorizationAPI.checkAuthorizationRole(request, jwtUtilities);
+
+        ArrayList<TaskDTO> list = new ArrayList<>();
+        ListTaskDTO taskList = new ListTaskDTO();
+
+        String email = jwtUtilities.extractUsername(request.getHeader("Authorization").substring(7));
+        List<Task> tasks = taskRepository.findByCreatoDa(email);
+
+
+        List<Task> filteredTasks = tasks.stream().filter
+                (task -> task.getStatus().equals
+                        (TaskStatus.DAFARE)).toList();
+
+        for (Task task : filteredTasks) {
+            TaskDTO taskDTO = new TaskDTO();
+            taskDTO.setId(task.getId());
+            taskDTO.setDescrizione(task.getDescrizione());
+            taskDTO.setCreatoDa(task.getCreatoDa());
+            taskDTO.setAssignedUserEmail(task.getAssignedUserEmail());
+            taskDTO.setLinkGitHub(task.getLinkGitHub());
+            taskDTO.setDataCreazione(task.getDataCreazione());
+            taskDTO.setStatus(task.getStatus());
+            taskDTO.setTitolo(task.getTitolo());
+            list.add(taskDTO);
+        }
+        taskList.setList(list);
+
+        return taskList;
+    }
+
 }
 
