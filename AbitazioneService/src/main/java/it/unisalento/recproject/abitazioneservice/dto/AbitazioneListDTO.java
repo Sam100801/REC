@@ -1,8 +1,8 @@
-package it.unisalento.recproject.recproject.dto;
+package it.unisalento.recproject.abitazioneservice.dto;
 
 import java.util.ArrayList;
 
-public class AbitazioniListDTO {
+public class AbitazioneListDTO {
     private ArrayList<AbitazioneDTO> list;
 
     public ArrayList<AbitazioneDTO> getList() {

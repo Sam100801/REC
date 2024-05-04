@@ -1,7 +1,14 @@
-package it.unisalento.recproject.recproject.dto;
+package it.unisalento.recproject.abitazioneservice.domain;
 
-public class AbitazioneDTO {
 
+import it.unisalento.recproject.abitazioneservice.dto.CapacitaCalcoloDTO;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document("abitazione")
+public class Abitazione {
+
+    @Id
     private String id;
     private CapacitaCalcoloDTO caratteristiche;
     private float ore;
@@ -9,19 +16,6 @@ public class AbitazioneDTO {
     private String energiaGreen;
     private String proprietario;
     private float energiaVenduta;
-
-    public AbitazioneDTO() {
-    }
-
-    public AbitazioneDTO(String  id, CapacitaCalcoloDTO caratteristiche, float ore, float kwh, String energiaGreen, String proprietario, float energia_venduta) {
-        this.id = id;
-        this.caratteristiche = caratteristiche;
-        this.ore = ore;
-        this.kwh = kwh;
-        this.energiaGreen = energiaGreen;
-        this.proprietario = proprietario;
-        this.energiaVenduta = energia_venduta;
-    }
 
     public float getEnergiaVenduta() {
         return energiaVenduta;
@@ -31,6 +25,18 @@ public class AbitazioneDTO {
         this.energiaVenduta = energiaVenduta;
     }
 
+    public Abitazione() {
+    }
+
+    public Abitazione(String  id, CapacitaCalcoloDTO caratteristiche, float ore, float kwh, String energiaGreen, String proprietario, float energia_venduta) {
+        this.id = id;
+        this.caratteristiche = caratteristiche;
+        this.ore = ore;
+        this.kwh = kwh;
+        this.energiaGreen = energiaGreen;
+        this.proprietario = proprietario;
+        this.energiaVenduta = energia_venduta;
+    }
 
     public CapacitaCalcoloDTO getCaratteristiche() {
         return caratteristiche;
@@ -79,4 +85,5 @@ public class AbitazioneDTO {
     public void setProprietario(String proprietario) {
         this.proprietario = proprietario;
     }
+
 }

@@ -1,11 +1,9 @@
 package it.unisalento.recproject.recproject.RestControllers;
 
 import it.unisalento.recproject.recproject.di.IRenewableSource;
-import it.unisalento.recproject.recproject.domain.Abitazione;
 import it.unisalento.recproject.recproject.domain.User;
 import it.unisalento.recproject.recproject.dto.*;
 import it.unisalento.recproject.recproject.exceptions.UserNotFoundException;
-import it.unisalento.recproject.recproject.repositories.AbitazioneRepository;
 import it.unisalento.recproject.recproject.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -25,8 +23,6 @@ public class UsersRestController { //gestisce le richieste REST relative agli ut
     IRenewableSource windTurbine;
     @Autowired
     UserRepository userRepository;
-    @Autowired
-    AbitazioneRepository abitazioneRepository;
 
     @RequestMapping(value="/{id}", method = RequestMethod.GET) //indirizzo di base per le richieste
     public UserDTO getUserById(@PathVariable String id) throws UserNotFoundException {
@@ -147,83 +143,4 @@ public class UsersRestController { //gestisce le richieste REST relative agli ut
         }
         return userDTO;
     }
-
-    @RequestMapping(value = "/searchByCpu", method = RequestMethod.GET)
-    public AbitazioniListDTO searchByCpu(@RequestParam float cpu){
-        AbitazioniListDTO abitazioniList = new AbitazioniListDTO();
-
-        ArrayList<AbitazioneDTO> abitazioni = new ArrayList<>();
-        abitazioniList.setList(abitazioni);
-
-        List<Abitazione> list = abitazioneRepository.findByCaratteristicheCpu(cpu);
-
-        for (Abitazione abitazione : list){
-            CapacitaCalcoloDTO caratteristiche = abitazione.getCaratteristiche();
-            if (caratteristiche != null && caratteristiche.getCpu() == cpu) {
-                AbitazioneDTO abitazioneDTO = new AbitazioneDTO();
-                abitazioneDTO.setId(abitazione.getId());
-                abitazioneDTO.setProprietario(abitazione.getProprietario());
-                abitazioneDTO.setKwh(abitazione.getKwh());
-                abitazioneDTO.setOre(abitazione.getOre());
-                abitazioneDTO.setEnergiaGreen(abitazione.getEnergiaGreen());
-                abitazioneDTO.setCaratteristiche(abitazione.getCaratteristiche());
-                abitazioneDTO.setEnergiaVenduta(abitazione.getEnergiaVenduta());
-                abitazioni.add(abitazioneDTO);
-            }
-        }
-        return abitazioniList;
-    }
-
-    @RequestMapping(value = "/searchBySistemaOperativo", method = RequestMethod.GET)
-    public AbitazioniListDTO searchBySistemaOperativo(@RequestParam String sistemaOperativo){
-        AbitazioniListDTO abitazioniList = new AbitazioniListDTO();
-
-        ArrayList<AbitazioneDTO> abitazioni = new ArrayList<>();
-        abitazioniList.setList(abitazioni);
-
-        List<Abitazione> list = abitazioneRepository.findByCaratteristicheSistemaOperativo(sistemaOperativo);
-
-        for (Abitazione abitazione : list){
-            CapacitaCalcoloDTO caratteristiche = abitazione.getCaratteristiche();
-            if (caratteristiche != null && caratteristiche.getSistemaOperativo().equals(sistemaOperativo)) {
-                AbitazioneDTO abitazioneDTO = new AbitazioneDTO();
-                abitazioneDTO.setId(abitazione.getId());
-                abitazioneDTO.setProprietario(abitazione.getProprietario());
-                abitazioneDTO.setKwh(abitazione.getKwh());
-                abitazioneDTO.setOre(abitazione.getOre());
-                abitazioneDTO.setEnergiaGreen(abitazione.getEnergiaGreen());
-                abitazioneDTO.setCaratteristiche(abitazione.getCaratteristiche());
-                abitazioneDTO.setEnergiaVenduta(abitazione.getEnergiaVenduta());
-                abitazioni.add(abitazioneDTO);
-            }
-        }
-        return abitazioniList;
-    }
-
-    @RequestMapping(value = "/searchByRam", method = RequestMethod.GET)
-    public AbitazioniListDTO searchByRam(@RequestParam int ram){
-        AbitazioniListDTO abitazioniList = new AbitazioniListDTO();
-
-        ArrayList<AbitazioneDTO> abitazioni = new ArrayList<>();
-        abitazioniList.setList(abitazioni);
-
-        List<Abitazione> list = abitazioneRepository.findByCaratteristicheRam(ram);
-
-        for (Abitazione abitazione : list){
-            CapacitaCalcoloDTO caratteristiche = abitazione.getCaratteristiche(); // Ottieni le caratteristiche dall'abitazione
-            if (caratteristiche != null && caratteristiche.getRam() == ram) { // Controlla se le caratteristiche non sono nulle e confronta la RAM
-                AbitazioneDTO abitazioneDTO = new AbitazioneDTO();
-                abitazioneDTO.setId(abitazione.getId());
-                abitazioneDTO.setProprietario(abitazione.getProprietario());
-                abitazioneDTO.setKwh(abitazione.getKwh());
-                abitazioneDTO.setOre(abitazione.getOre());
-                abitazioneDTO.setEnergiaGreen(abitazione.getEnergiaGreen());
-                abitazioneDTO.setCaratteristiche(caratteristiche); // Imposta le caratteristiche dell'abitazione
-                abitazioneDTO.setEnergiaVenduta(abitazione.getEnergiaVenduta());
-                abitazioni.add(abitazioneDTO);
-            }
-        }
-        return abitazioniList;
-    }
-
 }

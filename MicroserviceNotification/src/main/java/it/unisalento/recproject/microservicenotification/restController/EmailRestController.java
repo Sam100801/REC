@@ -2,7 +2,7 @@ package it.unisalento.recproject.microservicenotification.restController;
 
 import it.unisalento.recproject.microservicenotification.security.AuthorizationAPI;
 import it.unisalento.recproject.microservicenotification.security.JwtUtilities;
-import it.unisalento.recproject.microservicenotification.service.EmailService;
+import it.unisalento.recproject.microservicenotification.service.bridge.EmailService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +17,7 @@ public class EmailRestController {
 
     @Autowired
     private JwtUtilities jwtUtilities;
+
 
     @RequestMapping(value="/", method = RequestMethod.POST)
     public String sendMail(@RequestParam(value = "file", required = false) MultipartFile[] file, String to, String[] cc, String subject, String body, HttpServletRequest request) {

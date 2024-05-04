@@ -1,4 +1,4 @@
-package it.unisalento.recproject.recproject.dto;
+package it.unisalento.recproject.abitazioneservice.dto;
 
 public class CapacitaCalcoloDTO {
 
@@ -59,3 +59,4 @@ public class CapacitaCalcoloDTO {
                 '}';
     }
 }
+
