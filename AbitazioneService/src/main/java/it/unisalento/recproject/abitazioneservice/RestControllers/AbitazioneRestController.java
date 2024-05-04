@@ -119,9 +119,6 @@ public class AbitazioneRestController {
     @RequestMapping(value = "/energia_venduta/{id}", method = RequestMethod.GET)
     public float getEnergiaVenduta(@PathVariable String id) throws AbitazioneNotFoundException{
 
-        /**
-         * Bisogna fare una post in grado di effettuare la vendita di energia;
-         */
         Optional<Abitazione> abitazione = abitazioneRepository.findById(id);
 
         if (abitazione.isEmpty()){
@@ -148,6 +145,19 @@ public class AbitazioneRestController {
         }
 
         return energiaVendutaTotale;
+    }
+
+    @RequestMapping(value = "/energia_disponibile_totale", method = RequestMethod.GET)
+    public float getEnergiaDisponibileTotale(){
+        float energiaDisponibileTotale = 0.0F;
+
+        List<Abitazione> abitazioni = abitazioneRepository.findAll();
+
+        for (Abitazione abitazione : abitazioni){
+            energiaDisponibileTotale = energiaDisponibileTotale + (abitazione.getOre() * abitazione.getKwh());
+        }
+
+        return energiaDisponibileTotale;
     }
 
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
