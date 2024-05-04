@@ -109,7 +109,7 @@ public class AbitazioneRestController {
         List<Abitazione> abitazioni = abitazioneRepository.findAll();
 
         for (Abitazione abitazione : abitazioni){
-            kwhTotali = kwhTotali + abitazione.getKwh();
+            kwhTotali = kwhTotali + (abitazione.getKwh() * abitazione.getOre());
         }
 
         return kwhTotali;
@@ -145,19 +145,6 @@ public class AbitazioneRestController {
         }
 
         return energiaVendutaTotale;
-    }
-
-    @RequestMapping(value = "/energia_disponibile_totale", method = RequestMethod.GET)
-    public float getEnergiaDisponibileTotale(){
-        float energiaDisponibileTotale = 0.0F;
-
-        List<Abitazione> abitazioni = abitazioneRepository.findAll();
-
-        for (Abitazione abitazione : abitazioni){
-            energiaDisponibileTotale = energiaDisponibileTotale + (abitazione.getOre() * abitazione.getKwh());
-        }
-
-        return energiaDisponibileTotale;
     }
 
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)

@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+
+  my-sba-orderservice:
+    image: bellsoft/liberica-openjdk-alpine:17
+    container_name: mysbaimage-orderservice
+    ports:
+      - 8087:8080
+      - 8007:8000
+    expose:
+      - "8007"
+    depends_on:
+      - my-db-orderservice
+    networks:
+      - my-net
+    volumes:
+      - ./build/libs/OrderService-0.0.1-SNAPSHOT.jar:/app/app.jar
+    working_dir: /app
+    entrypoint: java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000 -jar /app/app.jar
+
+
+  my-db-orderservice:
+    image: mongo:5.0
+    container_name: mongodbimage-orderservice
+    ports:
+      - 27023:27023
+    command: ["mongod", "--port", "27023"]
+    networks:
+      - my-net
+
+networks:
+  my-net:
+    driver: "bridge"
+
