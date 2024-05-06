@@ -1,4 +1,4 @@
-package it.unisalento.recproject.paymentservice.Service;
+package it.unisalento.recproject.paymentservice.RestController;
 
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;

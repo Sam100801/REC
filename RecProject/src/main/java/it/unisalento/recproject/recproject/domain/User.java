@@ -19,8 +19,7 @@ public class User {
     private String email;
     private String username;
     private String password;
-    private float saldo;
-    private float crediti;
+    private String iban;
 
     public String getUsername() {
         return username;
@@ -36,14 +35,6 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public float getCrediti() {
-        return crediti;
-    }
-
-    public void setCrediti(float crediti) {
-        this.crediti = crediti;
     }
 
     public String getId() {
@@ -78,23 +69,11 @@ public class User {
         this.email = email;
     }
 
-    public float getSaldo() {
-        return saldo;
+    public String getIban() {
+        return iban;
     }
 
-    public void setSaldo(float saldo) {
-        this.saldo = saldo;
-    }
-
-    @Override
-    public String toString() {
-        return "UserDTO{" +
-                "id=" + id +
-                ", nome='" + nome + '\'' +
-                ", cognome='" + cognome + '\'' +
-                ", email='" + email + '\'' +
-                ", username='" + username + '\'' +
-                ", password='" + "..." + '\'' +
-                '}';
+    public void setIban(String iban) {
+        this.iban = iban;
     }
 }

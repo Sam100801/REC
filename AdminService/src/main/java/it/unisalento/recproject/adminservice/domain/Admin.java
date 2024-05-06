@@ -10,10 +10,9 @@ public class Admin {
     private String nome;
     private String cognome;
     private String email;
-    private String username;
-    private String password;
     private float incasso;
     private float saldo;
+    private String iban;
 
 
     public Admin() {
@@ -65,6 +64,14 @@ public class Admin {
 
     public void setSaldo(float saldo) {
         this.saldo = saldo;
+    }
+
+    public String getIban() {
+        return iban;
+    }
+
+    public void setIban(String iban) {
+        this.iban = iban;
     }
 }
 

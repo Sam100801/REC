@@ -13,8 +13,7 @@ public class Amministratore {
     private String email;
     private String username;
     private String password;
-    private float incasso;
-    private float saldo;
+    private String iban;
 
 
     public Amministratore() {
@@ -60,21 +59,6 @@ public class Amministratore {
         this.email = email;
     }
 
-    public float getIncasso() {
-        return incasso;
-    }
-
-    public void setIncasso(float incasso) {
-        this.incasso = incasso;
-    }
-
-    public float getSaldo() {
-        return saldo;
-    }
-
-    public void setSaldo(float saldo) {
-        this.saldo = saldo;
-    }
 
     public String getPassword() {
         return password;
@@ -82,5 +66,13 @@ public class Amministratore {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getIban() {
+        return iban;
+    }
+
+    public void setIban(String iban) {
+        this.iban = iban;
     }
 }

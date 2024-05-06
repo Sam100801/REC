@@ -1,18 +1,27 @@
 package it.unisalento.recproject.rewardservice.dto;
 
-public class RewardDTO {
+public class RewardAdminDTO {
     private String id;
     private String nome;
     private String descrizione;
     private String imageUrl;
+    private int quantita;
 
-    public RewardDTO() {
+    public RewardAdminDTO() {
     }
 
-    public RewardDTO(String id, String nome, String descrizione) {
+    public RewardAdminDTO(String id, String nome, String descrizione) {
         this.id = id;
         this.nome = nome;
         this.descrizione = descrizione;
+    }
+
+    public int getQuantita() {
+        return quantita;
+    }
+
+    public void setQuantita(int quantita) {
+        this.quantita = quantita;
     }
 
     public String getImageUrl() {

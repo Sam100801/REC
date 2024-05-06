@@ -10,6 +10,8 @@ public class UserDTO {
     private float crediti;
     private float saldo;
 
+    private String iban;
+
     public float getSaldo() {
         return saldo;
     }
@@ -74,15 +76,11 @@ public class UserDTO {
         this.email = email;
     }
 
-    @Override
-    public String toString() {
-        return "UserDTO{" +
-                "id=" + id +
-                ", nome='" + nome + '\'' +
-                ", cognome='" + cognome + '\'' +
-                ", email='" + email + '\'' +
-                ", username='" + username + '\'' +
-                ", password='" + "..." + '\'' +
-                '}';
+    public String getIban() {
+        return iban;
+    }
+
+    public void setIban(String iban) {
+        this.iban = iban;
     }
 }

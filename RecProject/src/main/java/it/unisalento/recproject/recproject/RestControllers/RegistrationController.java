@@ -10,10 +10,10 @@ import it.unisalento.recproject.recproject.repositories.AmministratoreRepository
 import it.unisalento.recproject.recproject.repositories.ProduttoreRepository;
 import it.unisalento.recproject.recproject.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+
 import static it.unisalento.recproject.recproject.configuration.SecurityConfig.passwordEncoder;
 
 
@@ -40,13 +40,20 @@ public class RegistrationController { //gestisce le richieste REST relative agli
             user.setNome(userDTO.getNome());
             user.setCognome(userDTO.getCognome());
             user.setEmail(userDTO.getEmail());
-            user.setUsername(userDTO.getUsername());
+            user.setIban(userDTO.getIban());
             user.setPassword(passwordEncoder().encode(userDTO.getPassword()));
 
             user = userRepository.save(user); //faccio questa assegnazione per avere l'id dell'utente
 
             userDTO.setId(user.getId()); //assegno l'id dell'utente al DTO
             userDTO.setPassword(null);
+
+            String url = "http://host.docker.internal:8088/api/users/registrazione";
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            HttpEntity<UserDTO> entity = new HttpEntity<>(userDTO, headers);
+            ResponseEntity<AmministratoreDTO> response = restTemplate.postForEntity(url, entity, AmministratoreDTO.class);
+
             return ResponseEntity.ok(userDTO);
         }
         else return new ResponseEntity<>("La registrazione non è andata a buon fine!", HttpStatus.BAD_REQUEST);
@@ -63,14 +70,22 @@ public class RegistrationController { //gestisce le richieste REST relative agli
             amministratore.setNome(amministratoreDTO.getNome());
             amministratore.setCognome(amministratoreDTO.getCognome());
             amministratore.setEmail(amministratoreDTO.getEmail());
+            amministratore.setIban(amministratoreDTO.getIban());
             amministratore.setPassword(passwordEncoder().encode(amministratoreDTO.getPassword()));
-            amministratore.setSaldo(0);
-            amministratore.setIncasso(0);
 
             amministratore = amministratoreRepository.save(amministratore);
 
             amministratoreDTO.setId(amministratore.getId());
             amministratoreDTO.setPassword(null);
+
+            String url = "http://host.docker.internal:8089/api/amministratore/registrazione";
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            HttpEntity<AmministratoreDTO> entity = new HttpEntity<>(amministratoreDTO, headers);
+            ResponseEntity<AmministratoreDTO> response = restTemplate.postForEntity(url, entity, AmministratoreDTO.class);
+
+
+
             return ResponseEntity.ok(amministratoreDTO);
         }
         else return new ResponseEntity<>("La registrazione non è andata a buon fine!", HttpStatus.BAD_REQUEST);
@@ -86,7 +101,7 @@ public class RegistrationController { //gestisce le richieste REST relative agli
             produttore.setNome(produttoreDTO.getNome());
             produttore.setCognome(produttoreDTO.getCognome());
             produttore.setEmail(produttoreDTO.getEmail());
-            produttore.setUsername(produttoreDTO.getUsername());
+            produttore.setIban(produttoreDTO.getIban());
             produttore.setPassword(passwordEncoder().encode(produttoreDTO.getPassword()));
 
 

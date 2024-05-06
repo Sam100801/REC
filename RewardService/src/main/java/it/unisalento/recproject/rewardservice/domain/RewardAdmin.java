@@ -3,24 +3,31 @@ package it.unisalento.recproject.rewardservice.domain;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document("reward")
-public class Reward {
+@Document("reward-user")
+public class RewardAdmin {
 
     @Id
     private String id;
     private String nome;
-    private String descrizione;
-    private boolean isAssigned; //true amministratore, false utente
+    private String descrizione;//true amministratore, false utente
     private String imageUrl;
-    // inserire foto reward
+    private int quantita;
 
-    public Reward() {
+    public RewardAdmin() {
     }
 
-    public Reward(String id, String nome, String descrizione) {
+    public RewardAdmin(String id, String nome, String descrizione) {
         this.id = id;
         this.nome = nome;
         this.descrizione = descrizione;
+    }
+
+    public int getQuantita() {
+        return quantita;
+    }
+
+    public void setQuantita(int quantita) {
+        this.quantita = quantita;
     }
 
     public String getImageUrl() {
@@ -29,14 +36,6 @@ public class Reward {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
-    }
-
-    public boolean isAssigned() {
-        return isAssigned;
-    }
-
-    public void setAssigned(boolean assigned) {
-        isAssigned = assigned;
     }
 
     public String getId() {

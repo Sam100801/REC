@@ -1,8 +1,8 @@
 package it.unisalento.recproject.rewardservice.RestControllers;
 
-import it.unisalento.recproject.rewardservice.domain.Reward;
-import it.unisalento.recproject.rewardservice.dto.RewardDTO;
-import it.unisalento.recproject.rewardservice.dto.RewardListDTO;
+import it.unisalento.recproject.rewardservice.domain.RewardAdmin;
+import it.unisalento.recproject.rewardservice.dto.RewardAdminDTO;
+import it.unisalento.recproject.rewardservice.dto.RewardAdminListDTO;
 import it.unisalento.recproject.rewardservice.repositories.RewardRepository;
 import it.unisalento.recproject.rewardservice.security.AuthorizationAPI;
 import it.unisalento.recproject.rewardservice.security.JwtUtilities;
@@ -27,12 +27,12 @@ public class RewardRestController {
     JwtUtilities jwtUtilities;
 
     @RequestMapping(value = "/crea_reward", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> create(@RequestBody RewardDTO rewardDTO, HttpServletRequest request) {
+    public ResponseEntity<String> create(@RequestBody RewardAdminDTO rewardDTO, HttpServletRequest request) {
 
         AuthorizationAPI authorizationAPI = new AuthorizationAPI();
         authorizationAPI.checkAuthorizationRole(request, jwtUtilities);
 
-        Reward reward = new Reward();
+        RewardAdmin reward = new RewardAdmin();
         reward.setImageUrl(rewardDTO.getImageUrl());
         reward.setNome(rewardDTO.getNome());
         reward.setDescrizione(rewardDTO.getDescrizione());
@@ -45,12 +45,12 @@ public class RewardRestController {
     }
 
     @RequestMapping(value = "/update/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> update(@RequestBody RewardDTO rewardDTO, @PathVariable String id, HttpServletRequest request) {
+    public ResponseEntity<String> update(@RequestBody RewardAdminDTO rewardDTO, @PathVariable String id, HttpServletRequest request) {
 
         AuthorizationAPI authorizationAPI = new AuthorizationAPI();
         authorizationAPI.checkAuthorizationRole(request, jwtUtilities);
 
-        Optional<Reward> reward = rewardRepository.findById(id);
+        Optional<RewardAdmin> reward = rewardRepository.findById(id);
 
         if (reward.isEmpty()) {
             return ResponseEntity.badRequest().body("Reward non trovato");
@@ -71,7 +71,7 @@ public class RewardRestController {
         AuthorizationAPI authorizationAPI = new AuthorizationAPI();
         authorizationAPI.checkAuthorizationRole(request, jwtUtilities);
 
-        Optional<Reward> reward = rewardRepository.findById(id);
+        Optional<RewardAdmin> reward = rewardRepository.findById(id);
 
         if (reward.isEmpty()) {
             return ResponseEntity.badRequest().body("Reward non trovato");
@@ -83,15 +83,15 @@ public class RewardRestController {
     }
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    public RewardListDTO getAll() {
+    public RewardAdminListDTO getAll() {
 
-        ArrayList<RewardDTO> list = new ArrayList<>();
-        RewardListDTO rewardList = new RewardListDTO();
+        ArrayList<RewardAdminDTO> list = new ArrayList<>();
+        RewardAdminListDTO rewardList = new RewardAdminListDTO();
 
-        List<Reward> rewards = rewardRepository.findAll();
+        List<RewardAdmin> rewards = rewardRepository.findAll();
 
-        for (Reward reward : rewards) {
-            RewardDTO rewardDTO = new RewardDTO();
+        for (RewardAdmin reward : rewards) {
+            RewardAdminDTO rewardDTO = new RewardAdminDTO();
             rewardDTO.setId(reward.getId());
             rewardDTO.setNome(reward.getNome());
             rewardDTO.setDescrizione(reward.getDescrizione());
@@ -104,15 +104,15 @@ public class RewardRestController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public RewardDTO getById(@PathVariable String id) {
+    public RewardAdminDTO getById(@PathVariable String id) {
 
-        Optional<Reward> reward = rewardRepository.findById(id);
+        Optional<RewardAdmin> reward = rewardRepository.findById(id);
 
         if (reward.isEmpty()) {
             return null;
         }
 
-        RewardDTO rewardDTO = new RewardDTO();
+        RewardAdminDTO rewardDTO = new RewardAdminDTO();
 
         rewardDTO.setId(reward.get().getId());
         rewardDTO.setNome(reward.get().getNome());

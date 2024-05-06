@@ -6,10 +6,10 @@ services:
     image: bellsoft/liberica-openjdk-alpine:17
     container_name: mysbaimage-adminservice
     ports:
-      - 8085:8080
-      - 8005:8000
+      - 8089:8080
+      - 8009:8000
     expose:
-      - "8005"
+      - "8009"
     depends_on:
       - my-db-adminservice
     networks:
@@ -24,7 +24,7 @@ services:
     image: mongo:5.0
     container_name: mongodbimage-adminservice
     ports:
-      - 27018:27018
+      - 27025:27025
     command: ["mongod", "--port", "27021"]
     networks:
       - my-net

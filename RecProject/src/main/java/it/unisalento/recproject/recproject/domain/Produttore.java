@@ -13,6 +13,7 @@ public class Produttore {
     private String email;
     private String username;
     private String password;
+    private String iban;
 
     public Produttore() {
     }
@@ -63,5 +64,13 @@ public class Produttore {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getIban() {
+        return iban;
+    }
+
+    public void setIban(String iban) {
+        this.iban = iban;
     }
 }

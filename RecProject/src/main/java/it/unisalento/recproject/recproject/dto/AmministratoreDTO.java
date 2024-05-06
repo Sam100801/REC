@@ -8,20 +8,10 @@ public class AmministratoreDTO {
     private String email;
     private String password;
     private String username;
-    private float incasso;
-    private float saldo;
+    private String iban;
 
     public AmministratoreDTO() {
     }
-
-    public AmministratoreDTO(String id, String nome, String cognome, String username, String email) {
-        this.id = id;
-        this.nome = nome;
-        this.cognome = cognome;
-        this.username = username;
-        this.email = email;
-    }
-
 
     public String getUsername() {
         return username;
@@ -29,22 +19,6 @@ public class AmministratoreDTO {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public float getSaldo() {
-        return saldo;
-    }
-
-    public void setSaldo(float saldo) {
-        this.saldo = saldo;
-    }
-
-    public float getIncasso() {
-        return incasso;
-    }
-
-    public void setIncasso(float incasso) {
-        this.incasso = incasso;
     }
 
     public String getId() {
@@ -85,5 +59,13 @@ public class AmministratoreDTO {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getIban() {
+        return iban;
+    }
+
+    public void setIban(String iban) {
+        this.iban = iban;
     }
 }

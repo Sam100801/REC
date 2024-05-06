@@ -8,16 +8,11 @@ public class AdminDTO {
     private String email;
     private float incasso;
     private float saldo;
+    private String iban;
 
     public AdminDTO() {
     }
 
-    public AdminDTO(String id, String nome, String cognome, String username, String email) {
-        this.id = id;
-        this.nome = nome;
-        this.cognome = cognome;
-        this.email = email;
-    }
 
     public float getSaldo() {
         return saldo;
@@ -65,6 +60,14 @@ public class AdminDTO {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getIban() {
+        return iban;
+    }
+
+    public void setIban(String iban) {
+        this.iban = iban;
     }
 }
 

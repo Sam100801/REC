@@ -238,5 +238,4 @@ public class AbitazioneRestController {
         return abitazioniList;
     }
 
-    // Bisogna fare una get per cercare le caratteristiche minime.
 }
