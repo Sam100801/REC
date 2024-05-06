@@ -12,10 +12,26 @@
         </option>
       </GradleProjectSettings>
       <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/AdminService" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/AdminService" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/MicroserviceNotification" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/MicroserviceNotification" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/OrderService" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/OrderService" />
           </set>
         </option>
       </GradleProjectSettings>
@@ -50,6 +66,22 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/TaskService" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/TransactionService" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/TransactionService" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/UserService" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/UserService" />
           </set>
         </option>
       </GradleProjectSettings>

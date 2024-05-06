@@ -10,17 +10,28 @@ import com.stripe.model.checkout.Session;
 import com.stripe.param.ExternalAccountCollectionCreateParams;
 import com.stripe.param.checkout.SessionCreateParams;
 import it.unisalento.recproject.paymentservice.Response.PaymentResponse;
+import it.unisalento.recproject.paymentservice.domain.Payment;
+import it.unisalento.recproject.paymentservice.dto.PaymentDTO;
+import it.unisalento.recproject.paymentservice.dto.PaymentListDTO;
+import it.unisalento.recproject.paymentservice.exceptions.PaymentException;
+import it.unisalento.recproject.paymentservice.repositories.PaymentRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
+@RequestMapping("/api/payments")
 public class PaymentController {
 
     private final String stripeSecretKey = "your_stripe_secret_key";
     private final String stripeAccountId = "your_stripe_account_id";
-    
+
+    @Autowired
+    PaymentRepository paymentRepository;
     
 
     @PostMapping("/create")
@@ -72,5 +83,61 @@ public class PaymentController {
             // Handle Stripe exceptions
             throw new RuntimeException("Error processing payment. Please try again later.", e);
         }
+    }
+
+    @RequestMapping(value = "/", method = RequestMethod.GET)
+    public PaymentListDTO getAll(){
+
+        ArrayList<PaymentDTO> list = new ArrayList<>();
+        PaymentListDTO paymentList = new PaymentListDTO();
+
+        List<Payment> payments = paymentRepository.findAll();
+
+        for (Payment payment : payments) {
+            PaymentDTO paymentDTO = new PaymentDTO();
+            paymentDTO.setIdPayment(payment.getIdPayment());
+            paymentDTO.setEmailReceivePayment(payment.getEmailReceivePayment());
+            paymentDTO.setEmailSendPayment(payment.getEmailSendPayment());
+            paymentDTO.setDatePayment(payment.getDatePayment());
+            list.add(paymentDTO);
+        }
+
+        paymentList.setList(list);
+
+        return paymentList;
+    }
+
+    @RequestMapping(value = "/{idReceivePayment}", method = RequestMethod.GET)
+    public PaymentDTO getByIdReceivePayment(@PathVariable String idReceivePayment) throws PaymentException {
+        Payment payment = paymentRepository.findById(idReceivePayment).orElse(null);
+
+        if(payment == null){
+            throw new PaymentException();
+        }
+
+        PaymentDTO paymentDTO = new PaymentDTO();
+        paymentDTO.setIdPayment(payment.getIdPayment());
+        paymentDTO.setEmailReceivePayment(payment.getEmailReceivePayment());
+        paymentDTO.setEmailSendPayment(payment.getEmailSendPayment());
+        paymentDTO.setDatePayment(payment.getDatePayment());
+
+        return paymentDTO;
+    }
+
+    @RequestMapping(value = "/{idSendPayment}", method = RequestMethod.GET)
+    public PaymentDTO getByIdSendPayment(@PathVariable String idSendPayment) throws PaymentException {
+        Payment payment = paymentRepository.findById(idSendPayment).orElse(null);
+
+        if(payment == null){
+            throw new PaymentException();
+        }
+
+        PaymentDTO paymentDTO = new PaymentDTO();
+        paymentDTO.setIdPayment(payment.getIdPayment());
+        paymentDTO.setEmailReceivePayment(payment.getEmailReceivePayment());
+        paymentDTO.setEmailSendPayment(payment.getEmailSendPayment());
+        paymentDTO.setDatePayment(payment.getDatePayment());
+
+        return paymentDTO;
     }
 }
