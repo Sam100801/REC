@@ -107,8 +107,8 @@ public class UserRestController { //gestisce le richieste REST relative agli ute
     }
 
 
-    @RequestMapping(value = "/searchUser", method = RequestMethod.GET)
-    public UserDTO search(@RequestParam String email){
+    @RequestMapping(value = "/searchUser/{email}", method = RequestMethod.GET)
+    public UserDTO search(@PathVariable String email){
 
         Optional<User> user = userRepository.findByEmail(email);
         UserDTO userDTO = new UserDTO();

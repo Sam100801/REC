@@ -1,7 +1,7 @@
 package it.unisalento.recproject.recproject.configuration;
 
 import it.unisalento.recproject.recproject.security.JwtAuthenticationFilter;
-import it.unisalento.recproject.recproject.service.CustomUserDetailsService;
+import it.unisalento.recproject.recproject.service.CustomDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,7 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     @Autowired
-    CustomUserDetailsService userDetailsService;
+    CustomDetailsService customDetailsService;
 
     @Bean
     public static PasswordEncoder passwordEncoder() {
@@ -37,7 +37,7 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http.cors().and().csrf().disable()
-                .authorizeRequests().requestMatchers("/api/login/", "/api/registrazione/user", "/api/registrazione/produttore", "/api/registrazione/amministratore").permitAll().
+                .authorizeRequests().requestMatchers("/api/login/", "/api/registrazione/**", "/api/registrazione/produttore", "/api/registrazione/amministratore").permitAll().
                 requestMatchers("/api/amministratore/**").hasRole("ADMIN").requestMatchers("/api/produttore/**").hasRole("PRODUTTORE").
                 requestMatchers("/api/users/**").hasRole("USER").
                 anyRequest().authenticated().and().sessionManagement()
@@ -49,7 +49,7 @@ public class SecurityConfig {
     @Bean
     public DaoAuthenticationProvider authProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setUserDetailsService(customDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
@@ -60,22 +60,4 @@ public class SecurityConfig {
         return new JwtAuthenticationFilter();
     }
 
-  /*  @Bean
-   public UserDetailsService userDetailsService() {
-
-        UserDetails roberto = User.builder()
-                .username("roberto")
-                .password(passwordEncoder().encode("12345"))
-                .roles("ADMIN")
-                .build();
-
-        UserDetails paolo = User.builder()
-                .username("paolo")
-                .password(passwordEncoder().encode("12345"))
-                .roles("USER")
-                .build();
-
-        return new InMemoryUserDetailsManager(roberto, paolo);
-
-    } */
 }

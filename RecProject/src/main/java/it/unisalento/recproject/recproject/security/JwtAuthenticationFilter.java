@@ -1,6 +1,6 @@
 package it.unisalento.recproject.recproject.security;
 
-import it.unisalento.recproject.recproject.service.CustomUserDetailsService;
+import it.unisalento.recproject.recproject.service.CustomDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,7 +20,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private JwtUtilities jwtUtilities ;
 
     @Autowired
-    private CustomUserDetailsService customerUserDetailsService;
+    private CustomDetailsService customerUserDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)

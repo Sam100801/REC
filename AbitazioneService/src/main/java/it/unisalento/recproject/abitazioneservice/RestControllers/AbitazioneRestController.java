@@ -34,7 +34,8 @@ public class AbitazioneRestController {
 
         abitazioneDTO.setId(abitazione.get().getId());
         abitazioneDTO.setProprietario(abitazione.get().getProprietario());
-        abitazioneDTO.setKwh(abitazione.get().getKwh());
+        abitazioneDTO.setViaENumeroCivico(abitazione.get().getViaENumeroCivico());
+        abitazioneDTO.setKw(abitazione.get().getKw());
         abitazioneDTO.setOre(abitazione.get().getOre());
         abitazioneDTO.setEnergiaGreen(abitazione.get().getEnergiaGreen());
         abitazioneDTO.setCaratteristiche(abitazione.get().getCaratteristiche());
@@ -54,7 +55,8 @@ public class AbitazioneRestController {
             AbitazioneDTO abitazioneDTO = new AbitazioneDTO();
             abitazioneDTO.setId(abitazione.getId());
             abitazioneDTO.setProprietario(abitazione.getProprietario());
-            abitazioneDTO.setKwh(abitazione.getKwh());
+            abitazioneDTO.setViaENumeroCivico(abitazione.getViaENumeroCivico());
+            abitazioneDTO.setKw(abitazione.getKw());
             abitazioneDTO.setOre(abitazione.getOre());
             abitazioneDTO.setEnergiaGreen(abitazione.getEnergiaGreen());
             abitazioneDTO.setCaratteristiche(abitazione.getCaratteristiche());
@@ -70,28 +72,37 @@ public class AbitazioneRestController {
 
     // E' un update che per l'abitazione va a cambiare le ore di energia disponibile, kwh e se è cambiato anche il tipo di energia green.
     @RequestMapping(value = "/energia_disponibile", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public float put(@RequestBody AbitazioneDTO abitazioneDTO ) {
-        Abitazione abitazione = new Abitazione();
-        abitazione.setId(abitazioneDTO.getId());
-        abitazione.setOre(abitazioneDTO.getOre());
-        abitazione.setKwh(abitazioneDTO.getKwh());
+    public float put(@RequestBody AbitazioneDTO abitazioneDTO) {
+        Optional<Abitazione> abitazioneOptional = abitazioneRepository.findById(abitazioneDTO.getId());
 
-        if (!abitazione.getEnergiaGreen().isEmpty())
+        if (abitazioneOptional.isEmpty()) {
+            throw new RuntimeException("Abitazione non trovata con ID: " + abitazioneDTO.getId());
+        }
+
+        Abitazione abitazione = abitazioneOptional.get();
+        abitazione.setOre(abitazioneDTO.getOre());
+        abitazione.setKw(abitazioneDTO.getKw());
+
+        if (abitazioneDTO.getEnergiaGreen() != null) {
             abitazione.setEnergiaGreen(abitazioneDTO.getEnergiaGreen());
+        }
 
         abitazione = abitazioneRepository.save(abitazione);
 
-        return abitazioneDTO.getKwh();
+
+        return abitazione.getKw();
     }
+
 
     @RequestMapping(value = "/crea_abitazione", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     public AbitazioneDTO post(@RequestBody AbitazioneDTO abitazioneDTO ) {
         Abitazione abitazione = new Abitazione();
 
         abitazione.setOre(abitazioneDTO.getOre());
-        abitazione.setKwh(abitazioneDTO.getKwh());
+        abitazione.setKw(abitazioneDTO.getKw());
         abitazione.setCaratteristiche(abitazioneDTO.getCaratteristiche());
         abitazione.setProprietario(abitazioneDTO.getProprietario());
+        abitazione.setViaENumeroCivico(abitazioneDTO.getViaENumeroCivico());
         abitazione.setEnergiaGreen(abitazioneDTO.getEnergiaGreen());
         abitazione.setEnergiaVenduta(abitazioneDTO.getEnergiaVenduta());
 
@@ -109,7 +120,7 @@ public class AbitazioneRestController {
         List<Abitazione> abitazioni = abitazioneRepository.findAll();
 
         for (Abitazione abitazione : abitazioni){
-            kwhTotali = kwhTotali + (abitazione.getKwh() * abitazione.getOre());
+            kwhTotali = kwhTotali + (abitazione.getKw() * abitazione.getOre());
         }
 
         return kwhTotali;
@@ -175,7 +186,8 @@ public class AbitazioneRestController {
                 AbitazioneDTO abitazioneDTO = new AbitazioneDTO();
                 abitazioneDTO.setId(abitazione.getId());
                 abitazioneDTO.setProprietario(abitazione.getProprietario());
-                abitazioneDTO.setKwh(abitazione.getKwh());
+                abitazioneDTO.setViaENumeroCivico(abitazione.getViaENumeroCivico());
+                abitazioneDTO.setKw(abitazione.getKw());
                 abitazioneDTO.setOre(abitazione.getOre());
                 abitazioneDTO.setEnergiaGreen(abitazione.getEnergiaGreen());
                 abitazioneDTO.setCaratteristiche(abitazione.getCaratteristiche());
@@ -201,7 +213,8 @@ public class AbitazioneRestController {
                 AbitazioneDTO abitazioneDTO = new AbitazioneDTO();
                 abitazioneDTO.setId(abitazione.getId());
                 abitazioneDTO.setProprietario(abitazione.getProprietario());
-                abitazioneDTO.setKwh(abitazione.getKwh());
+                abitazioneDTO.setViaENumeroCivico(abitazione.getViaENumeroCivico());
+                abitazioneDTO.setKw(abitazione.getKw());
                 abitazioneDTO.setOre(abitazione.getOre());
                 abitazioneDTO.setEnergiaGreen(abitazione.getEnergiaGreen());
                 abitazioneDTO.setCaratteristiche(abitazione.getCaratteristiche());
@@ -227,7 +240,8 @@ public class AbitazioneRestController {
                 AbitazioneDTO abitazioneDTO = new AbitazioneDTO();
                 abitazioneDTO.setId(abitazione.getId());
                 abitazioneDTO.setProprietario(abitazione.getProprietario());
-                abitazioneDTO.setKwh(abitazione.getKwh());
+                abitazioneDTO.setViaENumeroCivico(abitazione.getViaENumeroCivico());
+                abitazioneDTO.setKw(abitazione.getKw());
                 abitazioneDTO.setOre(abitazione.getOre());
                 abitazioneDTO.setEnergiaGreen(abitazione.getEnergiaGreen());
                 abitazioneDTO.setCaratteristiche(caratteristiche); // Imposta le caratteristiche dell'abitazione

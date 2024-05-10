@@ -4,6 +4,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
+
 @Document("produttore")
 public class Produttore {
     @Id
@@ -14,6 +16,9 @@ public class Produttore {
     private String username;
     private String password;
     private String iban;
+    private String otp;
+    private LocalDateTime otpGeneratedTime;
+    private boolean active;
 
     public Produttore() {
     }
@@ -72,5 +77,29 @@ public class Produttore {
 
     public void setIban(String iban) {
         this.iban = iban;
+    }
+
+    public String getOtp() {
+        return otp;
+    }
+
+    public void setOtp(String otp) {
+        this.otp = otp;
+    }
+
+    public LocalDateTime getOtpGeneratedTime() {
+        return otpGeneratedTime;
+    }
+
+    public void setOtpGeneratedTime(LocalDateTime otpGeneratedTime) {
+        this.otpGeneratedTime = otpGeneratedTime;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

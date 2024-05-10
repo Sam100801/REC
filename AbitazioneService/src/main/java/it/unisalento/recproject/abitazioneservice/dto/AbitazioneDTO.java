@@ -5,19 +5,20 @@ public class AbitazioneDTO {
     private String id;
     private CapacitaCalcoloDTO caratteristiche;
     private float ore;
-    private float kwh;
+    private float kw;
     private String energiaGreen;
     private String proprietario;
     private float energiaVenduta;
+    private String viaENumeroCivico;
 
     public AbitazioneDTO() {
     }
 
-    public AbitazioneDTO(String  id, CapacitaCalcoloDTO caratteristiche, float ore, float kwh, String energiaGreen, String proprietario, float energia_venduta) {
+    public AbitazioneDTO(String  id, CapacitaCalcoloDTO caratteristiche, float ore, float kw, String energiaGreen, String proprietario, float energia_venduta) {
         this.id = id;
         this.caratteristiche = caratteristiche;
         this.ore = ore;
-        this.kwh = kwh;
+        this.kw = kw;
         this.energiaGreen = energiaGreen;
         this.proprietario = proprietario;
         this.energiaVenduta = energia_venduta;
@@ -48,12 +49,12 @@ public class AbitazioneDTO {
         this.ore = ore;
     }
 
-    public float getKwh() {
-        return kwh;
+    public float getKw() {
+        return kw;
     }
 
-    public void setKwh(float kwh) {
-        this.kwh = kwh;
+    public void setKw(float kw) {
+        this.kw = kw;
     }
 
     public String getEnergiaGreen() {
@@ -78,6 +79,14 @@ public class AbitazioneDTO {
 
     public void setProprietario(String proprietario) {
         this.proprietario = proprietario;
+    }
+
+    public String getViaENumeroCivico() {
+        return viaENumeroCivico;
+    }
+
+    public void setViaENumeroCivico(String viaENumeroCivico) {
+        this.viaENumeroCivico = viaENumeroCivico;
     }
 }
 

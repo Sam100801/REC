@@ -7,18 +7,7 @@ public class UserDTO {
     private String email;
     private String username;
     private String password;
-    private float crediti;
-    private float saldo;
-
     private String iban;
-
-    public float getSaldo() {
-        return saldo;
-    }
-
-    public void setSaldo(float saldo) {
-        this.saldo = saldo;
-    }
 
     public String getUsername() {
         return username;
@@ -34,14 +23,6 @@ public class UserDTO {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public float getCrediti() {
-        return crediti;
-    }
-
-    public void setCrediti(float crediti) {
-        this.crediti = crediti;
     }
 
     public String getId() {
@@ -83,4 +64,5 @@ public class UserDTO {
     public void setIban(String iban) {
         this.iban = iban;
     }
+
 }
