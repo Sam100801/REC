@@ -10,7 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import static it.unisalento.recproject.abitazioneservice.security.SecurityConstants.JWT_SECRET;
+import static it.unisalento.recproject.userservice.security.SecurityConstants.JWT_SECRET;
+
 
 @Service
 public class JwtUtilities {
