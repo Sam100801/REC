@@ -38,9 +38,10 @@ public class PaymentController {
     private String stripeSecretKey2;
 
 
-    @RequestMapping(value = "/create-payment-link-user", method = RequestMethod.POST)
-    public PaymentResponse createPaymentLinkUser() throws StripeException {
+    @RequestMapping(value = "/create-payment-link-user/{costo}", method = RequestMethod.POST)
+    public PaymentResponse createPaymentLinkUser(@PathVariable float costo) throws StripeException {
 
+        costo = costo * 100;
         Stripe.apiKey = stripeSecretKey1;
 
         SessionCreateParams params = SessionCreateParams.builder()
@@ -52,7 +53,7 @@ public class PaymentController {
                         .setQuantity(1L).setPriceData(
                                 SessionCreateParams.LineItem.PriceData.builder()
                                         .setCurrency("eur")
-                                        .setUnitAmount(2000L)
+                                        .setUnitAmount((long) (costo * 1L))
                                         .setProductData(
                                                 SessionCreateParams.LineItem.PriceData.ProductData.builder()
                                                         .setName("Bolletta REC")
@@ -71,8 +72,8 @@ public class PaymentController {
         return paymentResponse;
     }
 
-    @RequestMapping(value = "/create-payment-link-admin", method = RequestMethod.POST)
-    public PaymentResponse createPaymentLinkAdmin() throws StripeException {
+    @RequestMapping(value = "/create-payment-link-admin/{costo}", method = RequestMethod.POST)
+    public PaymentResponse createPaymentLinkAdmin(@PathVariable float costo) throws StripeException {
 
             Stripe.apiKey = stripeSecretKey2;
 
@@ -85,7 +86,7 @@ public class PaymentController {
                             .setQuantity(1L).setPriceData(
                                     SessionCreateParams.LineItem.PriceData.builder()
                                             .setCurrency("eur")
-                                            .setUnitAmount(2000L)
+                                            .setUnitAmount((long) (costo * 100L))
                                             .setProductData(
                                                     SessionCreateParams.LineItem.PriceData.ProductData.builder()
                                                             .setName("Acquisto Rewards")

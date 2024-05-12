@@ -190,7 +190,7 @@ public class AdminRestController {
         pdfInvoiceCreator.createProduct(productList);
 
         // Chiamata all'API del microservizio pagamento per ottenere il link di pagamento
-        String url = "http://host.docker.internal:8082/api/payments/create-payment-link-user";
+        String url = "http://host.docker.internal:8082/api/payments/create-payment-link-user/" + pdfInvoiceCreator.getTotalSum(productList);
 
         ResponseEntity<PaymentResponse> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, PaymentResponse.class);
 

@@ -22,6 +22,8 @@ import it.unisalento.recproject.adminservice.service.pdf.componimentoPDFBolletta
 import it.unisalento.recproject.adminservice.service.pdf.componimentoPDFBolletta.ProductTableHeader;
 
 import java.io.FileNotFoundException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -70,7 +72,7 @@ public class PdfBolletta {
         float threecol=190f;
         float fullwidth[]={threecol*3};
         Table threeColTable2=new Table(threeColumnWidth);
-        float totalSum=getTotalSum(productList);
+        float totalSum= (float) getTotalSum(productList);
         for (VenditaEnergiaDTO energy:productList)
         {
             threeColTable2.addCell(new Cell().add(String.valueOf(energy.getDataAcquisto())).setBorder(Border.NO_BORDER)).setMarginLeft(10f);
@@ -96,9 +98,21 @@ public class PdfBolletta {
         document.add(getDividerTable(fullwidth).setBorder(new SolidBorder(Color.GRAY,1)).setMarginBottom(15f));
     }
 
-    public float getTotalSum(List<VenditaEnergiaDTO> productList) {
-        return  (float)productList.stream().mapToLong((p)-> (long) (p.getCostoEnergiaAcquistata())).sum();
+    public double getTotalSum(List<VenditaEnergiaDTO> productList) {
+        double sum = productList.stream()
+                .mapToDouble(VenditaEnergiaDTO::getCostoEnergiaAcquistata)
+                .sum();
+        return round(sum, 2); // Arrotonda il risultato a due cifre decimali
     }
+
+    public double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        BigDecimal bd = BigDecimal.valueOf(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
+    }
+
 
     public List<VenditaEnergiaDTO> getDummyProductList(VenditaEnergiaListDTO venditaEnergiaListDTO) {
         List<VenditaEnergiaDTO> venditaEnergia = new ArrayList<>();
