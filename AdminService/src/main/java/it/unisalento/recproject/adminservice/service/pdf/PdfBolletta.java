@@ -14,6 +14,8 @@ import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.property.TextAlignment;
+import it.unisalento.recproject.adminservice.dto.VenditaEnergiaDTO;
+import it.unisalento.recproject.adminservice.dto.VenditaEnergiaListDTO;
 import it.unisalento.recproject.adminservice.service.pdf.componimentoPDFBolletta.AddressDetails;
 import it.unisalento.recproject.adminservice.service.pdf.componimentoPDFBolletta.HeaderDetails;
 import it.unisalento.recproject.adminservice.service.pdf.componimentoPDFBolletta.MyFooter;
@@ -64,16 +66,16 @@ public class PdfBolletta {
         }
     }
 
-    public void createProduct(List<Energy> productList) {
+    public void createProduct(List<VenditaEnergiaDTO> productList) {
         float threecol=190f;
         float fullwidth[]={threecol*3};
         Table threeColTable2=new Table(threeColumnWidth);
         float totalSum=getTotalSum(productList);
-        for (Energy product:productList)
+        for (VenditaEnergiaDTO energy:productList)
         {
-            threeColTable2.addCell(new Cell().add(product.getPname().orElse("")).setBorder(Border.NO_BORDER)).setMarginLeft(10f);
-            threeColTable2.addCell(new Cell().add(String.valueOf(product.getQuantity())).setTextAlignment(TextAlignment.CENTER).setBorder(Border.NO_BORDER));
-            threeColTable2.addCell(new Cell().add(String.valueOf(product.getPriceperpeice())).setTextAlignment(TextAlignment.RIGHT).setBorder(Border.NO_BORDER)).setMarginRight(15f);
+            threeColTable2.addCell(new Cell().add(String.valueOf(energy.getDataAcquisto())).setBorder(Border.NO_BORDER)).setMarginLeft(10f);
+            threeColTable2.addCell(new Cell().add(String.valueOf(energy.getEnergiaAcquistata())).setTextAlignment(TextAlignment.CENTER).setBorder(Border.NO_BORDER));
+            threeColTable2.addCell(new Cell().add(String.valueOf(energy.getCostoEnergiaAcquistata())).setTextAlignment(TextAlignment.RIGHT).setBorder(Border.NO_BORDER)).setMarginRight(15f);
         }
 
         document.add(threeColTable2.setMarginBottom(20f));
@@ -94,28 +96,28 @@ public class PdfBolletta {
         document.add(getDividerTable(fullwidth).setBorder(new SolidBorder(Color.GRAY,1)).setMarginBottom(15f));
     }
 
-    public float getTotalSum(List<Energy> productList) {
-        return  (float)productList.stream().mapToLong((p)-> (long) (p.getPriceperpeice())).sum();
+    public float getTotalSum(List<VenditaEnergiaDTO> productList) {
+        return  (float)productList.stream().mapToLong((p)-> (long) (p.getCostoEnergiaAcquistata())).sum();
     }
 
-    public List<Energy> getDummyProductList(Map<String, Object> bollettaData) {
-        int quantity = (int) bollettaData.get("energiaAcquistata");
-        double price = (double) bollettaData.get("costoDaPagare");
-
-        // Creare la lista di prodotti con i parametri ottenuti
-        List<Energy> productList = new ArrayList<>();
-        productList.add(new Energy("Energia acquistata", quantity, price));
-        return productList;
+    public List<VenditaEnergiaDTO> getDummyProductList(VenditaEnergiaListDTO venditaEnergiaListDTO) {
+        List<VenditaEnergiaDTO> venditaEnergia = new ArrayList<>();
+        if (venditaEnergiaListDTO.getList() != null && !venditaEnergiaListDTO.getList().isEmpty()) {
+            for (VenditaEnergiaDTO venditaEnergiaDTO : venditaEnergiaListDTO.getList()) {
+                venditaEnergia.add(new VenditaEnergiaDTO(venditaEnergiaDTO.getDataAcquisto(), venditaEnergiaDTO.getEnergiaAcquistata(), venditaEnergiaDTO.getCostoEnergiaAcquistata()));
+            }
+        }
+        return venditaEnergia;
     }
 
 
     public void createTableHeader(ProductTableHeader productTableHeader) {
-        Paragraph producPara=new Paragraph("Prodotti");
+        Paragraph producPara=new Paragraph("Energia");
         document.add(producPara.setBold());
         Table threeColTable1=new Table(threeColumnWidth);
         threeColTable1.setBackgroundColor(Color.BLACK,0.7f);
 
-        threeColTable1.addCell(new Cell().add("Descrizione Servizio").setBold().setFontColor(Color.WHITE).setBorder(Border.NO_BORDER));
+        threeColTable1.addCell(new Cell().add("Data di Acquisto").setBold().setFontColor(Color.WHITE).setBorder(Border.NO_BORDER));
         threeColTable1.addCell(new Cell().add("Quantità (kWh)").setBold().setFontColor(Color.WHITE).setTextAlignment(TextAlignment.CENTER).setBorder(Border.NO_BORDER));
         threeColTable1.addCell(new Cell().add("Prezzo").setBold().setFontColor(Color.WHITE).setTextAlignment(TextAlignment.RIGHT).setBorder(Border.NO_BORDER)).setMarginRight(15f);
         document.add(threeColTable1);

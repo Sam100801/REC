@@ -3,8 +3,7 @@ package it.unisalento.recproject.adminservice.RestControllers;
 import it.unisalento.recproject.adminservice.domain.Admin;
 import it.unisalento.recproject.adminservice.domain.OrderAdmin;
 import it.unisalento.recproject.adminservice.domain.OrderUser;
-import it.unisalento.recproject.adminservice.dto.AdminDTO;
-import it.unisalento.recproject.adminservice.dto.AdminListDTO;
+import it.unisalento.recproject.adminservice.dto.*;
 import it.unisalento.recproject.adminservice.dto.RewardDTO;
 import it.unisalento.recproject.adminservice.exceptions.AdminException;
 import it.unisalento.recproject.adminservice.reporitories.AdminRepository;
@@ -152,8 +151,8 @@ public class AdminRestController {
         return amministratoreListDTO;
     }
 
-    @RequestMapping(value = "/EnergiaPDF", method = RequestMethod.POST)
-    public void creaPdfEnergiaAcquistata(@RequestBody Map<String, Object> bollettaData, HttpServletResponse response) throws IOException {
+    @RequestMapping(value = "/EnergiaPDF/{email}", method = RequestMethod.POST)
+    public void creaPdfEnergiaAcquistata(@PathVariable String email, HttpServletResponse response) throws IOException {
 
         String invoiceNo = String.valueOf(invoiceNumber++);
 
@@ -166,8 +165,19 @@ public class AdminRestController {
         headerDetails.setInvoiceNo(invoiceNo).setInvoiceDate(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))).setInvoiceTitle("Bolletta REC").setInvoiceNoText("Numero fattura:").setInvoiceDateText("Data fattura:");
         pdfInvoiceCreator.createHeader(headerDetails);
 
+        // Chiamata all'API del microservizio venditaEnergia per ottenere le vendite di energia dell'utente
+        RestTemplate restTemplate = new RestTemplate();
+        String urlEnergia = "http://host.docker.internal:8085/api/venditaEnergia/allByDateAndEmail/" + email;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
+        ResponseEntity<VenditaEnergiaListDTO> responseEntityEnergia = restTemplate.exchange(urlEnergia, HttpMethod.GET, requestEntity,VenditaEnergiaListDTO.class);
+        VenditaEnergiaListDTO venditaEnergiaListDTO = responseEntityEnergia.getBody();
+        assert venditaEnergiaListDTO != null;
+
+
         AddressDetails addressDetails = new AddressDetails();
-        addressDetails.setBillingCompany("REC").setBillingName("Samuel Miglietta").setBillingAddress("Via Piave 60").setBillingEmail("samuel@gmail.com").setShippingName("Cliente Samuel").setShippingAddress("Via delle rose 60").build();
+        addressDetails.setBillingCompany("REC").setBillingName("Samuel Schirinzi").setBillingAddress("Via Piave 60").setBillingEmail("progettoprincipi167@gmail.com").setShippingName(venditaEnergiaListDTO.getList().get(0).getEmailAcquirente()).setShippingAddress(venditaEnergiaListDTO.getList().get(0).getViaAcquirente()).build();
 
         pdfInvoiceCreator.createAddress(addressDetails);
 
@@ -175,16 +185,12 @@ public class AdminRestController {
         productTableHeader.setDescription("Energia acquistata").build();
 
         pdfInvoiceCreator.createTableHeader(productTableHeader);
-        List<Energy> productList = pdfInvoiceCreator.getDummyProductList(bollettaData);
-        productList = pdfInvoiceCreator.getDummyProductList(bollettaData);
+        List<VenditaEnergiaDTO> productList = pdfInvoiceCreator.getDummyProductList(venditaEnergiaListDTO);
+        productList = pdfInvoiceCreator.getDummyProductList(venditaEnergiaListDTO);
         pdfInvoiceCreator.createProduct(productList);
 
         // Chiamata all'API del microservizio pagamento per ottenere il link di pagamento
-        RestTemplate restTemplate = new RestTemplate();
         String url = "http://host.docker.internal:8082/api/payments/create-payment-link-user";
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
         ResponseEntity<PaymentResponse> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, PaymentResponse.class);
 
