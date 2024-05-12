@@ -16,6 +16,7 @@ import it.unisalento.recproject.paymentservice.dto.PaymentListDTO;
 import it.unisalento.recproject.paymentservice.exceptions.PaymentException;
 import it.unisalento.recproject.paymentservice.repositories.PaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -27,62 +28,80 @@ import java.util.Map;
 @RequestMapping("/api/payments")
 public class PaymentController {
 
-    private final String stripeSecretKey = "your_stripe_secret_key";
-    private final String stripeAccountId = "your_stripe_account_id";
-
     @Autowired
     PaymentRepository paymentRepository;
-    
 
-    @PostMapping("/create")
-    public PaymentResponse createPaymentLink(@RequestParam("iban") String iban) {
-        try {
-            // Set API key
-            Stripe.apiKey = stripeSecretKey;
+    @Value("${stripe.api.key1}")
+    private String stripeSecretKey1;
 
-            // Create bank account token
-            Map<String, Object> bankAccountParams = new HashMap<>();
-            bankAccountParams.put("type", "iban");
-            bankAccountParams.put("iban", iban);
+    @Value("${stripe.api.key2}")
+    private String stripeSecretKey2;
 
-            // Create bank account token
-            Token bankAccountToken = Token.create(bankAccountParams);
 
-            // Retrieve external accounts of the Stripe account
-            ExternalAccountCollection externalAccounts = Account.retrieve(stripeAccountId).getExternalAccounts();
+    @RequestMapping(value = "/create-payment-link-user", method = RequestMethod.POST)
+    public PaymentResponse createPaymentLinkUser() throws StripeException {
 
-            // Add bank account as payment method
-            ExternalAccount bankAccount = externalAccounts.create(
-                    ExternalAccountCollectionCreateParams.builder()
-                            .setExternalAccount(bankAccountToken.getId())
+        Stripe.apiKey = stripeSecretKey1;
+
+        SessionCreateParams params = SessionCreateParams.builder()
+                .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
+                .setMode(SessionCreateParams.Mode.PAYMENT)
+                .setSuccessUrl("http://localhost:8082/api/payments/confirm-payment")
+                .setCancelUrl("http://localhost:8082/api/payments/cancel-payment")
+                .addLineItem(SessionCreateParams.LineItem.builder()
+                        .setQuantity(1L).setPriceData(
+                                SessionCreateParams.LineItem.PriceData.builder()
+                                        .setCurrency("eur")
+                                        .setUnitAmount(2000L)
+                                        .setProductData(
+                                                SessionCreateParams.LineItem.PriceData.ProductData.builder()
+                                                        .setName("Bolletta REC")
+                                                        .build()
+                                        )
+                                        .build()
+                        )
+                        .build()
+                )
+                .build();
+
+        Session session = Session.create(params);
+
+        PaymentResponse paymentResponse = new PaymentResponse();
+        paymentResponse.setPaymentLink(session.getUrl());
+        return paymentResponse;
+    }
+
+    @RequestMapping(value = "/create-payment-link-admin", method = RequestMethod.POST)
+    public PaymentResponse createPaymentLinkAdmin() throws StripeException {
+
+            Stripe.apiKey = stripeSecretKey2;
+
+            SessionCreateParams params = SessionCreateParams.builder()
+                    .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
+                    .setMode(SessionCreateParams.Mode.PAYMENT)
+                    .setSuccessUrl("http://localhost:8082/api/payments/confirm-payment")
+                    .setCancelUrl("http://localhost:8082/api/payments/cancel-payment")
+                    .addLineItem(SessionCreateParams.LineItem.builder()
+                            .setQuantity(1L).setPriceData(
+                                    SessionCreateParams.LineItem.PriceData.builder()
+                                            .setCurrency("eur")
+                                            .setUnitAmount(2000L)
+                                            .setProductData(
+                                                    SessionCreateParams.LineItem.PriceData.ProductData.builder()
+                                                            .setName("Acquisto Rewards")
+                                                            .build()
+                                            )
+                                            .build()
+                            )
                             .build()
-            );
+                    )
+                    .build();
 
-            // Check if the bank account was added successfully
-            if (bankAccount != null) {
-                // Continue with creating the payment as before
-                SessionCreateParams params = SessionCreateParams.builder()
-                        .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
-                        .setMode(SessionCreateParams.Mode.PAYMENT)
-                        // Other payment details...
-                        .build();
+            Session session = Session.create(params);
 
-                // Create session with Stripe
-                Session session = Session.create(params);
-
-                // Build response with payment link
-                PaymentResponse paymentResponse = new PaymentResponse();
-                paymentResponse.setPaymentLink(session.getCurrency());
-
-                return paymentResponse;
-            } else {
-                // Handle case where bank account could not be added
-                throw new RuntimeException("Unable to add bank account. Check the provided details.");
-            }
-        } catch (StripeException e) {
-            // Handle Stripe exceptions
-            throw new RuntimeException("Error processing payment. Please try again later.", e);
-        }
+            PaymentResponse paymentResponse = new PaymentResponse();
+            paymentResponse.setPaymentLink(session.getUrl());
+            return paymentResponse;
     }
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
@@ -140,4 +159,15 @@ public class PaymentController {
 
         return paymentDTO;
     }
+
+    @RequestMapping(value = "confirm-payment", method = RequestMethod.POST)
+    public String confirmPayment(){
+        return "Pagamento avvenuto con successo!";
+    }
+
+    @RequestMapping(value = "cancel-payment", method = RequestMethod.POST)
+    public String cancelPayment(){
+        return "Pagamento annullato!";
+    }
+
 }

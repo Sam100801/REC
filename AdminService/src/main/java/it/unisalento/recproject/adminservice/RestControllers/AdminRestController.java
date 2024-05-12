@@ -1,20 +1,38 @@
 package it.unisalento.recproject.adminservice.RestControllers;
 
 import it.unisalento.recproject.adminservice.domain.Admin;
+import it.unisalento.recproject.adminservice.domain.OrderAdmin;
+import it.unisalento.recproject.adminservice.domain.OrderUser;
 import it.unisalento.recproject.adminservice.dto.AdminDTO;
 import it.unisalento.recproject.adminservice.dto.AdminListDTO;
+import it.unisalento.recproject.adminservice.dto.RewardDTO;
 import it.unisalento.recproject.adminservice.exceptions.AdminException;
 import it.unisalento.recproject.adminservice.reporitories.AdminRepository;
 import it.unisalento.recproject.adminservice.security.AuthorizationAPI;
 import it.unisalento.recproject.adminservice.security.JwtUtilities;
+import it.unisalento.recproject.adminservice.service.pdf.*;
+import it.unisalento.recproject.adminservice.service.pdf.componimentoPDFBolletta.AddressDetails;
+import it.unisalento.recproject.adminservice.service.pdf.componimentoPDFBolletta.HeaderDetails;
+import it.unisalento.recproject.adminservice.service.pdf.componimentoPDFBolletta.ProductTableHeader;
+import it.unisalento.recproject.adminservice.service.response.PaymentResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import javax.swing.plaf.BorderUIResource;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -26,6 +44,8 @@ public class AdminRestController {
 
     @Autowired
     JwtUtilities jwtUtilities;
+
+    private static int invoiceNumber = 1;
 
     @RequestMapping(value = "/registrazione", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> registrazione(@RequestBody AdminDTO amministratoreDTO){
@@ -130,5 +150,195 @@ public class AdminRestController {
             list.add(amministratoreDTO);
         }
         return amministratoreListDTO;
+    }
+
+    @RequestMapping(value = "/EnergiaPDF", method = RequestMethod.POST)
+    public void creaPdfEnergiaAcquistata(@RequestBody Map<String, Object> bollettaData, HttpServletResponse response) throws IOException {
+
+        String invoiceNo = String.valueOf(invoiceNumber++);
+
+        LocalDate ls = LocalDate.now();
+        String pdfName = "bolletta_" + ls + ".pdf";
+        PdfBolletta pdfInvoiceCreator = new PdfBolletta(pdfName);
+        pdfInvoiceCreator.createDocument();
+
+        HeaderDetails headerDetails = new HeaderDetails();
+        headerDetails.setInvoiceNo(invoiceNo).setInvoiceDate(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))).setInvoiceTitle("Bolletta REC").setInvoiceNoText("Numero fattura:").setInvoiceDateText("Data fattura:");
+        pdfInvoiceCreator.createHeader(headerDetails);
+
+        AddressDetails addressDetails = new AddressDetails();
+        addressDetails.setBillingCompany("REC").setBillingName("Samuel Miglietta").setBillingAddress("Via Piave 60").setBillingEmail("samuel@gmail.com").setShippingName("Cliente Samuel").setShippingAddress("Via delle rose 60").build();
+
+        pdfInvoiceCreator.createAddress(addressDetails);
+
+        ProductTableHeader productTableHeader = new ProductTableHeader();
+        productTableHeader.setDescription("Energia acquistata").build();
+
+        pdfInvoiceCreator.createTableHeader(productTableHeader);
+        List<Energy> productList = pdfInvoiceCreator.getDummyProductList(bollettaData);
+        productList = pdfInvoiceCreator.getDummyProductList(bollettaData);
+        pdfInvoiceCreator.createProduct(productList);
+
+        // Chiamata all'API del microservizio pagamento per ottenere il link di pagamento
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://host.docker.internal:8082/api/payments/create-payment-link-user";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
+
+        ResponseEntity<PaymentResponse> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, PaymentResponse.class);
+
+        // Ottenimento del corpo della risposta
+        PaymentResponse paymentResponse = responseEntity.getBody();
+        assert paymentResponse != null;
+
+        List<String> tncList = new ArrayList<>();
+        tncList.add("- Ci impegniamo a proteggere la privacy dei nostri clienti e ad utilizzare le loro informazioni personali solo per scopi commerciali interni. Consulta la nostra politica sulla privacy per ulteriori informazioni.");
+        tncList.add("- Il pagamento deve essere effettuato entro 30 giorni dalla data della fattura.");
+
+        String imagePath = "https://www.communityenergyinc.com/wp-content/uploads/download.jpg";
+
+        pdfInvoiceCreator.createTnc(tncList, false, imagePath);
+        pdfInvoiceCreator.addClickableButton("Clicca qui per pagare", paymentResponse.getPaymentLink());
+
+        pdfInvoiceCreator.closeDocument();
+
+        File pdfFile = new File(pdfName);
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition", "attachment; filename=" + pdfFile.getName());
+        response.setContentLength((int) pdfFile.length());
+        Files.copy(pdfFile.toPath(), response.getOutputStream());
+        response.getOutputStream().flush();
+
+        System.out.println("PDF created successfully");
+    }
+
+    @RequestMapping(value = "/RewardAdminPDF/{id}", method = RequestMethod.POST)
+    public void creaPdfRewardAdmin(@PathVariable String id, HttpServletResponse response) throws IOException {
+
+        String invoiceNo = String.valueOf(invoiceNumber++);
+
+        LocalDate ls = LocalDate.now();
+        String pdfName = "AcquistoRewardAdmin" + ls + ".pdf";
+        PdfOrdineRewardAdmin pdfInvoiceCreator = new PdfOrdineRewardAdmin(pdfName);
+        pdfInvoiceCreator.createDocument();
+
+        it.unisalento.recproject.adminservice.service.pdf.componimentoPDFOrdineReward.HeaderDetails headerDetails = new it.unisalento.recproject.adminservice.service.pdf.componimentoPDFOrdineReward.HeaderDetails();
+        headerDetails.setInvoiceNo(invoiceNo).setInvoiceDate(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))).setInvoiceTitle("Fattura REC").setInvoiceNoText("Numero fattura:").setInvoiceDateText("Data fattura:");
+        pdfInvoiceCreator.createHeader(headerDetails);
+
+        RestTemplate restTemplate = new RestTemplate();
+        String urlOrder = "http://host.docker.internal:8087/api/order/getAdmin/" + id;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
+        ResponseEntity <OrderAdmin> responseEntityOrder = restTemplate.exchange(urlOrder, HttpMethod.GET, requestEntity, OrderAdmin.class);
+
+        OrderAdmin orderAdmin = responseEntityOrder.getBody();
+
+
+        it.unisalento.recproject.adminservice.service.pdf.componimentoPDFOrdineReward.AddressDetails addressDetails = new it.unisalento.recproject.adminservice.service.pdf.componimentoPDFOrdineReward.AddressDetails();
+        assert orderAdmin != null;
+        addressDetails.setBillingCompany("REC").setBillingName("Samuel Miglietta").setBillingAddress("Via Piave 60").setBillingEmail("samuel@gmail.com").setShippingName("Cliente Samuel").setShippingAddress("Via delle rose 60").build();
+
+        pdfInvoiceCreator.createAddress(addressDetails);
+
+        it.unisalento.recproject.adminservice.service.pdf.componimentoPDFOrdineReward.ProductTableHeader productTableHeader = new it.unisalento.recproject.adminservice.service.pdf.componimentoPDFOrdineReward.ProductTableHeader();
+        productTableHeader.setDescription("Reward Acquistati").build();
+
+        pdfInvoiceCreator.createTableHeader(productTableHeader);
+
+        List<RewardDTO> productList = pdfInvoiceCreator.getDummyProductList(orderAdmin);
+        productList = pdfInvoiceCreator.getDummyProductList(orderAdmin);
+        pdfInvoiceCreator.createProduct(productList);
+
+        // Chiamata all'API del microservizio pagamento per ottenere il link di pagamento
+        String urlPagamento = "http://host.docker.internal:8082/api/payments/create-payment-link-admin";
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        ResponseEntity<PaymentResponse> responseEntity = restTemplate.exchange(urlPagamento, HttpMethod.POST, requestEntity, PaymentResponse.class);
+
+        // Ottenimento del corpo della risposta
+        PaymentResponse paymentResponse = responseEntity.getBody();
+        assert paymentResponse != null;
+
+        List<String> tncList = new ArrayList<>();
+        tncList.add("- Ci impegniamo a proteggere la privacy dei nostri clienti e ad utilizzare le loro informazioni personali solo per scopi commerciali interni. Consulta la nostra politica sulla privacy per ulteriori informazioni.");
+        tncList.add("- Il pagamento deve essere effettuato entro 30 giorni dalla data della fattura.");
+
+        String imagePath = "https://www.communityenergyinc.com/wp-content/uploads/download.jpg";
+
+        pdfInvoiceCreator.createTnc(tncList, false, imagePath);
+        pdfInvoiceCreator.addClickableButton("Clicca qui per pagare", paymentResponse.getPaymentLink());
+
+        pdfInvoiceCreator.closeDocument();
+
+        File pdfFile = new File(pdfName);
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition", "attachment; filename=" + pdfFile.getName());
+        response.setContentLength((int) pdfFile.length());
+        Files.copy(pdfFile.toPath(), response.getOutputStream());
+        response.getOutputStream().flush();
+
+        System.out.println("PDF created successfully");
+
+    }
+
+    @RequestMapping(value = "/RewardUserPDF/{id}", method = RequestMethod.POST)
+    public void creaPdfRewardUser(@PathVariable String id, HttpServletResponse response) throws IOException {
+
+        String invoiceNo = String.valueOf(invoiceNumber++);
+
+        LocalDate ls = LocalDate.now();
+        String pdfName = "AcquistoRewardUser" + ls + ".pdf";
+        PdfOrdineRewardUser pdfInvoiceCreator = new PdfOrdineRewardUser(pdfName);
+        pdfInvoiceCreator.createDocument();
+
+        it.unisalento.recproject.adminservice.service.pdf.componimentoPDFOrdineReward.HeaderDetails headerDetails = new it.unisalento.recproject.adminservice.service.pdf.componimentoPDFOrdineReward.HeaderDetails();
+        headerDetails.setInvoiceNo(invoiceNo).setInvoiceDate(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))).setInvoiceTitle("Fattura REC").setInvoiceNoText("Numero fattura:").setInvoiceDateText("Data fattura:");
+        pdfInvoiceCreator.createHeader(headerDetails);
+
+        RestTemplate restTemplate = new RestTemplate();
+        String urlOrder = "http://host.docker.internal:8087/api/order/getUser/" + id;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
+        ResponseEntity <OrderUser> responseEntityOrder = restTemplate.exchange(urlOrder, HttpMethod.GET, requestEntity, OrderUser.class);
+
+        OrderUser orderUser = responseEntityOrder.getBody();
+
+
+        it.unisalento.recproject.adminservice.service.pdf.componimentoPDFOrdineReward.AddressDetails addressDetails = new it.unisalento.recproject.adminservice.service.pdf.componimentoPDFOrdineReward.AddressDetails();
+        assert orderUser != null;
+        addressDetails.setBillingCompany("REC").setBillingName("Samuel Miglietta").setBillingAddress("Via Piave 60").setBillingEmail("samuel@gmail.com").setShippingName("Cliente Samuel").setShippingAddress("Via delle rose 60").build();
+
+        pdfInvoiceCreator.createAddress(addressDetails);
+
+        it.unisalento.recproject.adminservice.service.pdf.componimentoPDFOrdineReward.ProductTableHeader productTableHeader = new it.unisalento.recproject.adminservice.service.pdf.componimentoPDFOrdineReward.ProductTableHeader();
+        productTableHeader.setDescription("Reward Acquistati").build();
+
+        pdfInvoiceCreator.createTableHeader(productTableHeader);
+
+        List<RewardDTO> productList = pdfInvoiceCreator.getDummyProductList(orderUser);
+        productList = pdfInvoiceCreator.getDummyProductList(orderUser);
+        pdfInvoiceCreator.createProduct(productList);
+
+        List<String> tncList = new ArrayList<>();
+        tncList.add("- Ci impegniamo a proteggere la privacy dei nostri clienti e ad utilizzare le loro informazioni personali solo per scopi commerciali interni. Consulta la nostra politica sulla privacy per ulteriori informazioni.");
+        tncList.add("- Il pagamento deve essere effettuato entro 30 giorni dalla data della fattura.");
+
+        String imagePath = "https://www.communityenergyinc.com/wp-content/uploads/download.jpg";
+
+        pdfInvoiceCreator.createTnc(tncList, false, imagePath);
+        pdfInvoiceCreator.closeDocument();
+
+        File pdfFile = new File(pdfName);
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition", "attachment; filename=" + pdfFile.getName());
+        response.setContentLength((int) pdfFile.length());
+        Files.copy(pdfFile.toPath(), response.getOutputStream());
+        response.getOutputStream().flush();
+
+        System.out.println("PDF created successfully");
     }
 }
