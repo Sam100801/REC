@@ -5,6 +5,7 @@ package it.unisalento.recproject.userservice.RestController;
 import it.unisalento.recproject.userservice.domain.User;
 import it.unisalento.recproject.userservice.dto.UserDTO;
 import it.unisalento.recproject.userservice.dto.UsersListDTO;
+import it.unisalento.recproject.userservice.exceptions.CreditiInsufficientiException;
 import it.unisalento.recproject.userservice.exceptions.UserNotFoundException;
 import it.unisalento.recproject.userservice.repositories.UserRepository;
 import it.unisalento.recproject.userservice.security.AuthorizationAPI;
@@ -94,18 +95,49 @@ public class UserRestController { //gestisce le richieste REST relative agli ute
     @RequestMapping(value = "/crediti/{email}", method = RequestMethod.GET)
     public float getCrediti(@PathVariable String email, HttpServletRequest request) throws UserNotFoundException {
 
-        AuthorizationAPI authorizationAPI = new AuthorizationAPI();
-        authorizationAPI.checkAuthorizationRole(request, jwtUtilities);
 
-        Optional<User> user = userRepository.findById(email);
+
+        Optional<User> user = userRepository.findByEmail(email);
 
         if (user.isEmpty()){
-            throw new UserNotFoundException();
+            throw new UserNotFoundException(email);
         }
 
         return user.get().getCrediti();
     }
 
+    // Cambia i crediti di un utente
+    @RequestMapping(value = "/addCrediti/{email}", method = RequestMethod.PUT)
+    public void putCrediti(@PathVariable String email, @RequestParam float crediti) throws UserNotFoundException {
+
+
+        Optional<User> user = userRepository.findByEmail(email);
+
+        if (user.isEmpty()){
+            throw new UserNotFoundException(email);
+        }
+
+        user.get().setCrediti((user.get().getCrediti() + crediti));
+        userRepository.save(user.get());
+    }
+
+    @RequestMapping(value = "/togliCrediti/{email}", method = RequestMethod.PUT)
+    public void togliCrediti(@PathVariable String email, @RequestParam float crediti) throws UserNotFoundException, CreditiInsufficientiException {
+
+
+        Optional<User> user = userRepository.findByEmail(email);
+
+        if (user.isEmpty()){
+            throw new UserNotFoundException(email);
+        }
+
+        if ((user.get().getCrediti() - crediti) < 0){
+            throw new CreditiInsufficientiException();
+        }
+
+        user.get().setCrediti((user.get().getCrediti() - crediti));
+        userRepository.save(user.get());
+    }
 
     @RequestMapping(value = "/searchUser/{email}", method = RequestMethod.GET)
     public UserDTO search(@PathVariable String email){
@@ -113,7 +145,7 @@ public class UserRestController { //gestisce le richieste REST relative agli ute
         Optional<User> user = userRepository.findByEmail(email);
         UserDTO userDTO = new UserDTO();
 
-        if (user != null){
+        if (user.isPresent()){
             userDTO.setId(user.get().getId());
             userDTO.setNome(user.get().getNome());
             userDTO.setCognome(user.get().getCognome());

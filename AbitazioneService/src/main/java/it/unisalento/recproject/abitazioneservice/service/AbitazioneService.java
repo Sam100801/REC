@@ -12,7 +12,12 @@ import it.unisalento.recproject.abitazioneservice.exceptions.EnergiaInsufficient
 import it.unisalento.recproject.abitazioneservice.repositories.AbitazioneRepository;
 import it.unisalento.recproject.abitazioneservice.repositories.VenditaEnergiaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -93,8 +98,20 @@ public class AbitazioneService {
 
         venditaEnergiaRepository.save(venditaEnergia);
 
+        assegnaCrediti(venditaEnergiaDTO.getEnergiaAcquistata(), venditaEnergiaDTO.getEmailVenditore());
+
         return venditaEnergiaDTO;
     }
 
+    public void assegnaCrediti(float energiaAcquistata, String email){
+
+        // Suppponiamo che ogni kwh equivalga a mezzo credito
+        float crediti = (float) (energiaAcquistata * 0.50);
+
+        String url = "http://host.docker.internal:8088/api/users/addCrediti/"+email+"?crediti="+crediti;
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<Void> response1 = restTemplate.exchange(url, HttpMethod.PUT, null, Void.class);
+
+    }
 
 }

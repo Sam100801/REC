@@ -265,6 +265,14 @@ public class CustomDetailsService implements UserDetailsService {
 
             produttoreDTO.setId(produttore.getId());
             produttoreDTO.setPassword(null);
+
+            url = "http://host.docker.internal:8086/api/produttore/registrazione";
+            restTemplate = new RestTemplate();
+            headers = new HttpHeaders();
+            HttpEntity<ProduttoreDTO> entity = new HttpEntity<>(produttoreDTO, headers);
+            ResponseEntity<ProduttoreDTO> response1 = restTemplate.postForEntity(url, entity, ProduttoreDTO.class);
+
+
             return ResponseEntity.ok(produttoreDTO);
         }
         else return new ResponseEntity<>("La registrazione non è andata a buon fine!", HttpStatus.BAD_REQUEST);

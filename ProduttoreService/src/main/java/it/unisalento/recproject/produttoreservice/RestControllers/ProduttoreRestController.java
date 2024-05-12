@@ -1,11 +1,14 @@
-package it.unisalento.recproject.recproject.RestControllers;
+package it.unisalento.recproject.produttoreservice.RestControllers;
 
-import it.unisalento.recproject.recproject.domain.Produttore;
-import it.unisalento.recproject.recproject.dto.*;
-import it.unisalento.recproject.recproject.exceptions.ProduttoreNotFoundException;
-import it.unisalento.recproject.recproject.repositories.ProduttoreRepository;
+
+import it.unisalento.recproject.produttoreservice.domain.Produttore;
+import it.unisalento.recproject.produttoreservice.dto.ProduttoreDTO;
+import it.unisalento.recproject.produttoreservice.dto.ProduttoreListDTO;
+import it.unisalento.recproject.produttoreservice.exceptions.ProduttoreNotFoundException;
+import it.unisalento.recproject.produttoreservice.reporitories.ProduttoreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -18,6 +21,22 @@ public class ProduttoreRestController {
 
     @Autowired
     ProduttoreRepository produttoreRepository;
+
+    @RequestMapping(value = "/registrazione", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> registrazione(@RequestBody ProduttoreDTO produttoreDTO){
+
+        Produttore produttore = new Produttore();
+        produttore.setNome(produttoreDTO.getNome());
+        produttore.setCognome(produttoreDTO.getCognome());
+        produttore.setEmail(produttoreDTO.getEmail());
+        produttore.setIban(produttoreDTO.getIban());
+
+        produttore = produttoreRepository.save(produttore);
+
+        produttoreDTO.setId(produttore.getId());
+
+        return ResponseEntity.ok(produttoreDTO);
+    }
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public ProduttoreListDTO getAll(){

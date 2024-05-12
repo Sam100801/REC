@@ -1,4 +1,4 @@
-package it.unisalento.recproject.recproject.dto;
+package it.unisalento.recproject.produttoreservice.dto;
 
 import java.util.ArrayList;
 
