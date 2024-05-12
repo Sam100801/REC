@@ -245,7 +245,7 @@ public class AdminRestController {
 
         it.unisalento.recproject.adminservice.service.pdf.componimentoPDFOrdineReward.AddressDetails addressDetails = new it.unisalento.recproject.adminservice.service.pdf.componimentoPDFOrdineReward.AddressDetails();
         assert orderAdmin != null;
-        addressDetails.setBillingCompany("REC").setBillingName("Samuel Miglietta").setBillingAddress("Via Piave 60").setBillingEmail("samuel@gmail.com").setShippingName("Cliente Samuel").setShippingAddress("Via delle rose 60").build();
+        addressDetails.setBillingCompany("REC").setBillingName("Samuel Schirinzi").setBillingAddress("Via Piave 60").setBillingEmail("progettoprincipi167@gmail.com").setShippingName("Samuel Schirinzi").setShippingAddress("Via Piave 60").build();
 
         pdfInvoiceCreator.createAddress(addressDetails);
 
@@ -259,7 +259,7 @@ public class AdminRestController {
         pdfInvoiceCreator.createProduct(productList);
 
         // Chiamata all'API del microservizio pagamento per ottenere il link di pagamento
-        String urlPagamento = "http://host.docker.internal:8082/api/payments/create-payment-link-admin";
+        String urlPagamento = "http://host.docker.internal:8082/api/payments/create-payment-link-admin/" + pdfInvoiceCreator.getTotalSum(productList);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         ResponseEntity<PaymentResponse> responseEntity = restTemplate.exchange(urlPagamento, HttpMethod.POST, requestEntity, PaymentResponse.class);
@@ -313,10 +313,16 @@ public class AdminRestController {
 
         OrderUser orderUser = responseEntityOrder.getBody();
 
+        assert orderUser != null;
+        String urlProprietario = "http://host.docker.internal:8085/api/abitazione/get/" + orderUser.getUserEmail();
+        ResponseEntity<AbitazioneDTO> abitazioneDTOResponseEntity = restTemplate.exchange(urlProprietario, HttpMethod.GET, requestEntity, AbitazioneDTO.class);
+
+        AbitazioneDTO abitazioneDTO = abitazioneDTOResponseEntity.getBody();
 
         it.unisalento.recproject.adminservice.service.pdf.componimentoPDFOrdineReward.AddressDetails addressDetails = new it.unisalento.recproject.adminservice.service.pdf.componimentoPDFOrdineReward.AddressDetails();
-        assert orderUser != null;
-        addressDetails.setBillingCompany("REC").setBillingName("Samuel Miglietta").setBillingAddress("Via Piave 60").setBillingEmail("samuel@gmail.com").setShippingName("Cliente Samuel").setShippingAddress("Via delle rose 60").build();
+
+        assert abitazioneDTO != null;
+        addressDetails.setBillingCompany("REC").setBillingName("Samuel Schirinzi").setBillingAddress("Via Piave 60").setBillingEmail("progettoprincipi167@gmail.com").setShippingName(orderUser.getUserEmail()).setShippingAddress(abitazioneDTO.getViaENumeroCivico()).build();
 
         pdfInvoiceCreator.createAddress(addressDetails);
 

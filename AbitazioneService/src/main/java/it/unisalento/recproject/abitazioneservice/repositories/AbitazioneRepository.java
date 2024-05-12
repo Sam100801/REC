@@ -1,6 +1,7 @@
 package it.unisalento.recproject.abitazioneservice.repositories;
 
 import it.unisalento.recproject.abitazioneservice.domain.Abitazione;
+import it.unisalento.recproject.abitazioneservice.dto.AbitazioneDTO;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
@@ -13,4 +14,5 @@ public interface AbitazioneRepository extends MongoRepository<Abitazione, String
     List<Abitazione> findByCaratteristicheRam(int ram);
     @Query("{ 'caratteristiche.sistemaOperativo' : ?0 }")
     List<Abitazione> findByCaratteristicheSistemaOperativo(String sistemaOperativo);
+    AbitazioneDTO findByProprietario (String proprietario);
 }

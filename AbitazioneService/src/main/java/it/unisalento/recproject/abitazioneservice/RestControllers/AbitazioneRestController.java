@@ -44,6 +44,28 @@ public class AbitazioneRestController {
         return abitazioneDTO;
     }
 
+    @RequestMapping(value = "/get/{proprietario}", method = RequestMethod.GET)
+    public AbitazioneDTO getByProprietario(@PathVariable String proprietario){
+
+        AbitazioneDTO abitazioneDTO = abitazioneRepository.findByProprietario(proprietario);
+
+        if (abitazioneDTO == null){
+            throw new RuntimeException("Abitazione non trovata con proprietario: " + proprietario);
+        }
+
+        AbitazioneDTO abitazione = new AbitazioneDTO();
+        abitazione.setId(abitazioneDTO.getId());
+        abitazione.setProprietario(abitazioneDTO.getProprietario());
+        abitazione.setViaENumeroCivico(abitazioneDTO.getViaENumeroCivico());
+        abitazione.setKw(abitazioneDTO.getKw());
+        abitazione.setOre(abitazioneDTO.getOre());
+        abitazione.setEnergiaGreen(abitazioneDTO.getEnergiaGreen());
+        abitazione.setCaratteristiche(abitazioneDTO.getCaratteristiche());
+        abitazione.setEnergiaVenduta(abitazioneDTO.getEnergiaVenduta());
+
+        return abitazione;
+    }
+
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public AbitazioneListDTO getAll() {
         ArrayList<AbitazioneDTO> list = new ArrayList<>();

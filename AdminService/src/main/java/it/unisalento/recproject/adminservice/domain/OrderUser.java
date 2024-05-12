@@ -23,6 +23,7 @@ public class OrderUser {
         this.rewards = rewards;
     }
 
+
     public LocalDateTime getLocalDateTime() {
         return localDateTime;
     }

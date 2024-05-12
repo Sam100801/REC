@@ -89,7 +89,7 @@ public class PdfBolletta {
 
         Table threeColTable3=new Table(threeColumnWidth);
         threeColTable3.addCell(new Cell().add("").setBorder(Border.NO_BORDER)).setMarginLeft(10f);
-        threeColTable3.addCell(new Cell().add("Total").setTextAlignment(TextAlignment.CENTER).setBorder(Border.NO_BORDER));
+        threeColTable3.addCell(new Cell().add("Totale").setTextAlignment(TextAlignment.CENTER).setBorder(Border.NO_BORDER));
         threeColTable3.addCell(new Cell().add(String.valueOf(totalSum)).setTextAlignment(TextAlignment.RIGHT).setBorder(Border.NO_BORDER)).setMarginRight(15f);
 
         document.add(threeColTable3);

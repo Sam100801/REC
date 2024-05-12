@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -75,7 +76,8 @@ public class PaymentController {
     @RequestMapping(value = "/create-payment-link-admin/{costo}", method = RequestMethod.POST)
     public PaymentResponse createPaymentLinkAdmin(@PathVariable float costo) throws StripeException {
 
-            Stripe.apiKey = stripeSecretKey2;
+             costo = costo * 100;
+             Stripe.apiKey = stripeSecretKey2;
 
             SessionCreateParams params = SessionCreateParams.builder()
                     .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
@@ -86,7 +88,7 @@ public class PaymentController {
                             .setQuantity(1L).setPriceData(
                                     SessionCreateParams.LineItem.PriceData.builder()
                                             .setCurrency("eur")
-                                            .setUnitAmount((long) (costo * 100L))
+                                            .setUnitAmount((long) (costo * 1L))
                                             .setProductData(
                                                     SessionCreateParams.LineItem.PriceData.ProductData.builder()
                                                             .setName("Acquisto Rewards")
@@ -161,9 +163,17 @@ public class PaymentController {
         return paymentDTO;
     }
 
-    @RequestMapping(value = "confirm-payment", method = RequestMethod.POST)
-    public String confirmPayment(){
-        return "Pagamento avvenuto con successo!";
+    @RequestMapping(value = "/confirm-payment", method = RequestMethod.POST)
+    public void confirmPayment(@RequestParam("session_id") String sessionId) throws StripeException {
+        Stripe.apiKey = stripeSecretKey2;
+        Session session = Session.retrieve(sessionId);
+        if (session.getPaymentStatus().equals("paid")) {
+            Payment payment = new Payment();
+            payment.setDatePayment(LocalDateTime.now());
+            paymentRepository.save(payment);
+        } else {
+            System.out.println("Pagamento non effettuato");
+        }
     }
 
     @RequestMapping(value = "cancel-payment", method = RequestMethod.POST)
