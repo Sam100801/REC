@@ -171,8 +171,8 @@ public class AbitazioneRestController {
         return "L'utente con id " + id + " è stato eliminato";
     }
 
-    @RequestMapping(value = "/searchByCpu", method = RequestMethod.GET)
-    public AbitazioneListDTO searchByCpu(@RequestParam float cpu){
+    @RequestMapping(value = "/searchByCpu/{cpu}", method = RequestMethod.GET)
+    public AbitazioneListDTO searchByCpu(@PathVariable float cpu){
         AbitazioneListDTO abitazioniList = new AbitazioneListDTO();
 
         ArrayList<AbitazioneDTO> abitazioni = new ArrayList<>();
@@ -198,8 +198,8 @@ public class AbitazioneRestController {
         return abitazioniList;
     }
 
-    @RequestMapping(value = "/searchBySistemaOperativo", method = RequestMethod.GET)
-    public AbitazioneListDTO searchBySistemaOperativo(@RequestParam String sistemaOperativo){
+    @RequestMapping(value = "/searchBySistemaOperativo/{sistemaOperativo}", method = RequestMethod.GET)
+    public AbitazioneListDTO searchBySistemaOperativo(@PathVariable String sistemaOperativo){
         AbitazioneListDTO abitazioniList = new AbitazioneListDTO();
 
         ArrayList<AbitazioneDTO> abitazioni = new ArrayList<>();
@@ -225,8 +225,8 @@ public class AbitazioneRestController {
         return abitazioniList;
     }
 
-    @RequestMapping(value = "/searchByRam", method = RequestMethod.GET)
-    public AbitazioneListDTO searchByRam(@RequestParam int ram){
+    @RequestMapping(value = "/searchByRam/{ram}", method = RequestMethod.GET)
+    public AbitazioneListDTO searchByRam(@PathVariable int ram){
         AbitazioneListDTO abitazioniList = new AbitazioneListDTO();
 
         ArrayList<AbitazioneDTO> abitazioni = new ArrayList<>();

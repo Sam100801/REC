@@ -62,7 +62,11 @@ public class VenditaEnergiaDTO {
     }
 
     public void setDataAcquisto() {
-        this.dataAcquisto = LocalDateTime.from(LocalDate.now());
+        this.dataAcquisto = LocalDateTime.now();
+    }
+
+    public void setDataAcquisto1(LocalDateTime dateTime) {
+        this.dataAcquisto = dateTime;
     }
 
     public float getEnergiaAcquistata() {
