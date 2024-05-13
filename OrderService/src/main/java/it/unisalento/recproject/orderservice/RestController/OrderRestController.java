@@ -10,9 +10,11 @@ import it.unisalento.recproject.orderservice.security.AuthorizationAPI;
 import it.unisalento.recproject.orderservice.security.JwtUtilities;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -103,6 +105,10 @@ public class OrderRestController {
             newOrder.setCostoCrediti(totalCrediti);
             newOrder.setLocalDateTime(LocalDateTime.now());
             newOrder.setRewards(rewards);
+
+            String url = "http://host.docker.internal:8088/api/users/togliCrediti/"+email+"?crediti=" + (float) totalCrediti;
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<Void> response1 = restTemplate.exchange(url, HttpMethod.PUT, null, Void.class);
 
             newOrder = orderUserRepository.save(newOrder);
 
